@@ -112,6 +112,32 @@ class CartProvider with ChangeNotifier {
     _saveCartItems(); // Save cart items after clearing
     notifyListeners();
   }
+  ///for update cart quantity based on product id
+  void updateQuantityById(int productId, int newQuantity) {
+    int index = _cartItems.indexWhere((item) => item.id == productId);
+    if (index != -1) {
+      if (newQuantity <= 0) {
+        _cartItems.removeAt(index);
+      } else {
+        _cartItems[index].quantity = newQuantity;
+      }
+      _saveCartItems();
+      notifyListeners();
+    }
+  }
+  int getProductQuantityById(int productId) {
+    CartItem item = _cartItems.firstWhere((item) => item.id == productId,
+        orElse: () => CartItem(
+            id: productId,
+            quantity: 0,
+            image: '',
+            name: '',
+            company_name: '',
+            sell_price: 0,
+            after_discount_price: 0,
+            subtitle: ''));
+    return item != null ? item.quantity : 0;
+  }
 
 }
 // class FavoriteProvider extends ChangeNotifier {

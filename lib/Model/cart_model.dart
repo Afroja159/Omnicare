@@ -1,37 +1,3 @@
-// class CartItem {
-//   final int id;
-//   String image;
-//   String name; // Change 'title' to 'name'
-//   num sell_price;
-//   double after_discount_price;
-//   String subtitle;
-//   int quantity;
-//   bool addedFromProductDetails;
-//
-//   CartItem({
-//     required this.id,
-//     required this.image,
-//     required this.name, // Change 'title' to 'name'
-//     required this.sell_price,
-//     required this.after_discount_price,
-//     required this.subtitle,
-//     required this.quantity,
-//     this.addedFromProductDetails = false,
-//   });
-//
-//   Map<String, dynamic> toMap() {
-//     return {
-//       'id': id,
-//       'image': image,
-//       'name': name, // Change 'title' to 'name'
-//       'sell_price': sell_price,
-//       'after_discount_price': after_discount_price,
-//       'subtitle': subtitle,
-//       'quantity': quantity,
-//       'addedFromProductDetails': addedFromProductDetails,
-//     };
-//   }
-// }
 class CartItem {
   final int id;
   String image;

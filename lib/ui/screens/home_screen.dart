@@ -1,21 +1,18 @@
-import 'dart:convert';
+// ignore_for_file: avoid_print, prefer_const_constructors, prefer_const_literals_to_create_immutables, override_on_non_overriding_member
+
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import 'package:http/http.dart' as http;
 import 'package:omnicare_app/const/custom_appbar.dart';
 import 'package:omnicare_app/controller/company_controller.dart';
 import 'package:omnicare_app/controller/home_controller.dart';
-import 'package:omnicare_app/hive/company_hive/company_hive_service.dart';
 import 'package:omnicare_app/hive/home_hive/hive_model.dart';
 import 'package:omnicare_app/hive/home_hive/home_hive.dart';
 import 'package:omnicare_app/ui/widgets/home/all_product_section.dart';
 import 'package:omnicare_app/ui/widgets/home/company_section.dart';
-import 'package:omnicare_app/ui/widgets/home/featured_product_section.dart';
 import 'package:omnicare_app/ui/widgets/home/offered_product_section.dart';
 import 'package:omnicare_app/ui/widgets/home/other_product_section.dart';
-
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -39,6 +36,7 @@ class _HomeScreenState extends State<HomeScreen> {
       loadData();
     }
   }
+
   void loadData() async {
     try {
       homeController.isLoading.value = true;
@@ -60,15 +58,17 @@ class _HomeScreenState extends State<HomeScreen> {
       homeController.isLoading.value = false;
     }
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar:  PreferredSize(
+      appBar: PreferredSize(
         preferredSize: Size.fromHeight(kToolbarHeight),
-        child: CustomAppBar( onNotificationUpdate: (hasUpdate) {
-          // Handle notification update from CustomAppBar
-          print('Notification Update Received: $hasUpdate');
-        },
+        child: CustomAppBar(
+          onNotificationUpdate: (hasUpdate) {
+            // Handle notification update from CustomAppBar
+            print('Notification Update Received: $hasUpdate');
+          },
         ),
       ),
       body: Obx(() {
@@ -107,7 +107,8 @@ class _HomeScreenState extends State<HomeScreen> {
                             height: 180.0,
                             autoPlay: true,
                             autoPlayInterval: const Duration(seconds: 10),
-                            autoPlayAnimationDuration: const Duration(milliseconds: 800),
+                            autoPlayAnimationDuration:
+                            const Duration(milliseconds: 800),
                             pauseAutoPlayOnTouch: true,
                             viewportFraction: 1.0,
                             enlargeCenterPage: false,
@@ -134,7 +135,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                   ),
                                   decoration: BoxDecoration(
                                     shape: BoxShape.circle,
-                                    color: index == homeController.currentIndex.value
+                                    color: index ==
+                                        homeController.currentIndex.value
                                         ? Colors.blue // Active dot color
                                         : Colors.grey, // Inactive dot color
                                   ),
@@ -150,9 +152,10 @@ class _HomeScreenState extends State<HomeScreen> {
                       children: [
                         Padding(
                           padding: EdgeInsets.symmetric(vertical: 5.h),
-                          child: CompanySection(companyController: companyController),
+                          child: CompanySection(
+
+                          ),
                         ),
-                        const FeaturedProductsSection(),
                         const OfferedProductSection(),
                         const AllProductSection(),
                         SizedBox(
@@ -179,6 +182,7 @@ class _HomeScreenState extends State<HomeScreen> {
       }),
     );
   }
+
   @override
   bool get wantKeepAlive => true;
 }

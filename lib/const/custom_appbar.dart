@@ -1,24 +1,22 @@
+// ignore_for_file: avoid_print, unnecessary_null_comparison
+
 import 'dart:convert';
-import 'package:flutter/foundation.dart';
 import 'package:flutter_phone_direct_caller/flutter_phone_direct_caller.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:get/get.dart';
-import 'package:omnicare_app/const/custom_widgets.dart';
 import 'package:omnicare_app/ui/subscreens/account/wishlist_screen.dart';
 import 'package:omnicare_app/ui/subscreens/notification_screen.dart';
 import 'package:omnicare_app/ui/utils/image_assets.dart';
 import 'package:http/http.dart' as http;
 import 'package:omnicare_app/ui/widgets/home/search_product_screen.dart';
-import 'package:url_launcher/url_launcher.dart';
-import 'package:permission_handler/permission_handler.dart';
 
 class CustomAppBar extends StatefulWidget {
   final Function(bool) onNotificationUpdate;
 
-  const CustomAppBar({Key? key, required this.onNotificationUpdate}) : super(key: key);
+  const CustomAppBar({Key? key, required this.onNotificationUpdate})
+      : super(key: key);
   @override
   State<CustomAppBar> createState() => _CustomAppBarState();
 }
@@ -42,9 +40,8 @@ class _CustomAppBarState extends State<CustomAppBar> {
     _checkForNewNotifications();
   }
 
-
   Future<void> _fetchPhoneNumber() async {
-    final apiUrl = "https://app.omnicare.com.bd/api/settings";
+    const apiUrl = "https://app.omnicare.com.bd/api/settings";
 
     try {
       final response = await http.get(Uri.parse(apiUrl));
@@ -52,7 +49,7 @@ class _CustomAppBarState extends State<CustomAppBar> {
         final Map<String, dynamic> data = json.decode(response.body);
 
         // Print the full API response
-        print("API Response: $data");
+        //print("API Response: $data");
 
         // Extract phone number from the response
         final List<dynamic> siteSettings = data['site_settigs'];
@@ -85,13 +82,15 @@ class _CustomAppBarState extends State<CustomAppBar> {
       } else {
         // Handle error
         print("Failed to fetch phone number: ${response.statusCode}");
-        print("API Response: ${response.body}"); // Print the API response for error analysis
+        print(
+            "API Response: ${response.body}"); // Print the API response for error analysis
       }
     } catch (e) {
       // Handle error
       print("Error fetching phone number: $e");
     }
   }
+
   // Future<void> _makePhoneCall() async {
   //   // Check if permission is granted
   //   if (await Permission.phone
@@ -120,21 +119,27 @@ class _CustomAppBarState extends State<CustomAppBar> {
   // }
   Future<void> _checkForNewNotifications() async {
     try {
-      final response = await http.get(Uri.parse("https://app.omnicare.com.bd/api/settings"));
+      final response =
+      await http.get(Uri.parse("https://app.omnicare.com.bd/api/settings"));
       if (response.statusCode == 200) {
         final Map<String, dynamic> data = json.decode(response.body);
         final List<dynamic> siteSettings = data['site_settigs'];
 
         if (siteSettings.isNotEmpty) {
           final Map<String, dynamic> currentSetting = siteSettings.first;
-          final List<String> currentNotificationTexts = List.generate(5, (index) => currentSetting['notification_text_${index + 1}'] ?? '');
+          final List<String> currentNotificationTexts = List.generate(
+              5,
+                  (index) =>
+              currentSetting['notification_text_${index + 1}'] ?? '');
 
           if (_hasNewNotifications(currentNotificationTexts)) {
             setState(() {
-              showNotificationDot = true; // Set showNotificationDot to true if there are new notifications
+              showNotificationDot =
+              true; // Set showNotificationDot to true if there are new notifications
             });
             if (widget.onNotificationUpdate != null) {
-              widget.onNotificationUpdate(true); // Notify the parent widget of the new notifications
+              widget.onNotificationUpdate(
+                  true); // Notify the parent widget of the new notifications
             }
           }
         }
@@ -150,14 +155,15 @@ class _CustomAppBarState extends State<CustomAppBar> {
     // If there are differences, return true; otherwise, return false
     // You can compare it with the previous state if you have stored it
     // For simplicity, let's assume all notifications are new for now
-    return currentNotificationTexts.any((notification) => notification.isNotEmpty);
+    return currentNotificationTexts
+        .any((notification) => notification.isNotEmpty);
   }
+
   void handleNotificationUpdate(bool hasUpdate) {
     setState(() {
       showNotificationDot = hasUpdate;
     });
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -180,31 +186,28 @@ class _CustomAppBarState extends State<CustomAppBar> {
               width: 130,
               child: TextButton(
                 onPressed: () {
-                  Get.to(const SearchedProductScreen());
+                  Get.to(()=>const SearchedProductScreen());
                 },
                 child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 5),
-                    height: 100,
-                    width: 170,
-                    decoration: BoxDecoration(borderRadius: BorderRadius.circular(10),
-                      color: Colors.white,),
-
-                    child: Row(
-                      // mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        const Icon(
-                          Icons.search,
-                          size: 15,
-                        ),
-                        SizedBox(
-                          width: 6.w,
-                        ),
-                        const Text(
-                          "Search Product",
-                          style: TextStyle(color: Colors.grey, fontSize: 10),
-                        ),
-                      ],
-                    )),
+                  padding: const EdgeInsets.symmetric(horizontal: 5),
+                  height: 100,
+                  width: 170,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10),
+                    color: Colors.white,
+                  ),
+                  child: Row(
+                    // mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Icon(Icons.search, size: 15),
+                      SizedBox(width: 6.w),
+                      const Text(
+                        "Search Product",
+                        style: TextStyle(color: Colors.grey, fontSize: 10),
+                      ),
+                    ],
+                  ),
+                ),
               ),
             ),
             // SizedBox(width: 25.w),
@@ -226,9 +229,12 @@ class _CustomAppBarState extends State<CustomAppBar> {
                     setState(() {
                       isNotificationScreenVisible = true;
                     });
-                    Get.to(() => NotificationScreen(
-                      onNotificationUpdate: handleNotificationUpdate, // Pass the callback function
-                    ))?.then((_) {
+                    Get.to(
+                          () => NotificationScreen(
+                        onNotificationUpdate:
+                        handleNotificationUpdate, // Pass the callback function
+                      ),
+                    )?.then((_) {
                       setState(() {
                         isNotificationScreenVisible = false;
                         _checkForNewNotifications(); // Recheck for new notifications after returning from the notification screen
@@ -248,7 +254,7 @@ class _CustomAppBarState extends State<CustomAppBar> {
                     child: Container(
                       width: 10,
                       height: 10,
-                      decoration: BoxDecoration(
+                      decoration: const BoxDecoration(
                         color: Colors.red,
                         shape: BoxShape.circle,
                       ),
@@ -258,14 +264,15 @@ class _CustomAppBarState extends State<CustomAppBar> {
             ),
             SizedBox(width: 10.w),
             InkWell(
-                onTap: () {
-                  Get.to(() => const WishlistScreen());
-                },
-                radius: 100.r,
-                child: const Icon(
-                  Icons.favorite,
-                  color: Colors.white,
-                )),
+              onTap: () {
+                Get.to(() => const WishlistScreen());
+              },
+              radius: 100.r,
+              child: const Icon(
+                Icons.favorite,
+                color: Colors.white,
+              ),
+            ),
           ],
         ),
       ),

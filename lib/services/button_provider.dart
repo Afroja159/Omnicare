@@ -1,16 +1,3 @@
-// import 'package:flutter/material.dart';
-//
-// class QuantityButtonsProvider with ChangeNotifier {
-//   bool _showQuantityButtons = false;
-//
-//   bool get showQuantityButtons => _showQuantityButtons;
-//
-//   void setShowQuantityButtons(bool value) {
-//     _showQuantityButtons = value;
-//     notifyListeners();
-//   }
-// }
-//
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 

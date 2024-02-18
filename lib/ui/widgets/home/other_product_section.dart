@@ -311,43 +311,27 @@ class _OtherProductsSectionState extends State<OtherProductsSection> {
         id: productId,
         image: otherproductList[index]['image'] ?? 'default_image_path',
         name: otherproductList[index]['name'] ?? 'Unknown Product',
-        sell_price: double.parse('${otherproductList[index]['sell_price'].replaceAll(',', '')}'),
+        sell_price: double.parse(
+            '${otherproductList[index]['sell_price'].replaceAll(',', '')}'),
         after_discount_price: double.parse(
             '${otherproductList[index]['after_discount_price'].replaceAll(',', '')}'),
-        company_name: otherproductList[index]['brand']['brand_name'] ?? 'Unknown Company',
+        company_name: otherproductList[index]['brand']['brand_name'] ??
+            'Unknown Company',
         subtitle: otherproductList[index]['name'] ?? 'Unknown Product',
         quantity: 1,
         addedFromProductDetails: true,
       );
       cartProvider.addToCart(item);
       cartProvider.updateQuantity(productId, 1);
-      // ScaffoldMessenger.of(context).showSnackBar(
-      //   SnackBar(
-      //     content: Container(
-      //       height: 30.h,
-      //       child: Row(
-      //         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      //         children: [
-      //           const Text('Added to cart'),
-      //           TextButton(
-      //             onPressed: () {
-      //               Get.to(const CartScreen());
-      //             },
-      //             child: const Text('View', style: TextStyle(color: Colors.yellow)),
-      //           )
-      //         ],
-      //       ),
-      //     ),
-      //   ),
-      // );
       context.read<QuantityButtonsProvider>().setShowQuantityButtons(false);
     }
   }
-  // This method updates the quantity in the productQuantities map
+
   // This method updates the quantity in the productQuantities map
   void updateProductQuantityInMap(int productId, int newQuantity) {
     setState(() {
       productQuantities[productId] = newQuantity;
+
       // Check if the new quantity is zero
       if (newQuantity == 0) {
         // Remove the product from the cart
@@ -378,6 +362,8 @@ class _OtherProductsSectionState extends State<OtherProductsSection> {
               childAspectRatio: 0.60),
           itemCount: displayedProducts.length,
           itemBuilder: (context, index) {
+            var cartProviders =
+            Provider.of<CartProvider>(context, listen: false);
             return Stack(
               children: [InkWell(
                 onTap: () {
@@ -471,16 +457,26 @@ class _OtherProductsSectionState extends State<OtherProductsSection> {
                             // ),
                             //Spacer(),
                             // Display either the "ADD" button or quantity control buttons
-                            productQuantities[otherproductList[index]['id']] == 0 ||
-                                productQuantities[otherproductList[index]['id']] == null
+                            int.parse(cartProviders
+                                .getProductQuantityById(
+                                otherproductList[index]
+                                ['id'])
+                                .toString()) ==
+                                0
                                 ? InkWell(
                               onTap: () {
                                 setState(() {
-                                  productQuantities[otherproductList[index]['id']] =
-                                      (productQuantities[otherproductList[index]['id']] ?? 0) + 1;
+                                  productQuantities[
+                                  otherproductList[index][
+                                  'id']] = (productQuantities[
+                                  otherproductList[
+                                  index]['id']] ??
+                                      0) +
+                                      1;
                                   showQuantityButtons = true;
                                 });
-                                SchedulerBinding.instance!.addPostFrameCallback((_) {
+                                SchedulerBinding.instance
+                                    .addPostFrameCallback((_) {
                                   addToCart(index);
                                 });
                               },
@@ -492,14 +488,16 @@ class _OtherProductsSectionState extends State<OtherProductsSection> {
                                   vertical: 5.h,
                                 ),
                                 decoration: BoxDecoration(
-                                  color: ColorPalette.primaryColor,
+                                  color:
+                                  ColorPalette.primaryColor,
                                   borderRadius:
                                   BorderRadius.circular(5),
                                 ),
                                 child: Center(
                                   child: Row(
                                     mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
+                                    MainAxisAlignment
+                                        .spaceBetween,
                                     children: [
                                       Text(
                                         'ADD',
@@ -521,80 +519,34 @@ class _OtherProductsSectionState extends State<OtherProductsSection> {
                             )
                                 : Row(
                               children: [
+                                ///decrement cart quantity
                                 InkWell(
                                   onTap: () {
                                     setState(() {
-                                      if (productQuantities[otherproductList[index]['id']] != null &&
-                                          productQuantities[otherproductList[index]['id']]! > 0) {
-                                        productQuantities[otherproductList[index]['id']] =
-                                            productQuantities[otherproductList[index]['id']]! - 1;
-                                        if (productQuantities[otherproductList[index]['id']] == 0) {
-                                          showQuantityButtons = false;
-                                        }
-                                      }
-                                      var cartProvider = Provider.of<CartProvider>(context, listen: false);
-                                      CartItem? existingItem;
-                                      try {
-                                        existingItem =
-                                            cartProvider.cartItems.firstWhere((item) => item.name == otherproductList[index]['name'],
-                                            );
-                                      } catch (e) {
-                                        existingItem = null;
-                                      }
-                                      if (existingItem != null) {
-                                        // If the item is already in the cart, increment its quantity
-                                        existingItem.quantity -= 1;
-                                        // Notify listeners to update the UI
-                                        cartProvider.notifyListeners();
-                       // Show a SnackBar to notify the user about the quantity increment
-                                      } else {
-                                        // If the item is not in the cart, add it
-                                        var item = CartItem(
-                                          id: otherproductList[index]['id']
-                                          as int,
-                                          image: otherproductList[index]
-                                          ['image'] ??
-                                              'default_image_path',
-                                          name: otherproductList[index]
-                                          ['name'] ??
-                                              'Unknown Product',
-                                          sell_price: double.parse(
-                                              '${otherproductList[index]['sell_price'].replaceAll(',', '')}'),
-                                          after_discount_price: double.parse(
-                                              '${otherproductList[index]['after_discount_price'].replaceAll(',', '')}'),
-                                          company_name: otherproductList[index]
-                                          ['brand']['brand_name'] ??
-                                              'Unknown Company',
-                                          subtitle: otherproductList[index]['name'] ?? 'Unknown Product',
-                                          quantity: 1,
-                                          addedFromProductDetails: true,
-                                        );
-                                        // Add the item to the cartProvider
-                                        cartProvider.addToCart(item);
-                                        // Show a SnackBar to notify the user about the item being added to the cart
-                                        // if (mounted) {
-                                        //   ScaffoldMessenger.of(context)
-                                        //       .showSnackBar(
-                                        //     const SnackBar(
-                                        //         duration: Duration(milliseconds: 1),
-                                        //         content: Text('Added to Cart')),
-                                        //   );
-                                        // }
-                                      }
-                                      // Notify the CartProvider
-                                      Provider.of<CartProvider>(context, listen: false).notifyListeners();
-                                      // Update the product quantity in the map
-                                      updateProductQuantityInMap(
-                                          otherproductList[index]['id'],
-                                          productQuantities[otherproductList[index]['id']] ?? 0);
+                                      var quantity = cartProviders
+                                          .getProductQuantityById(
+                                        otherproductList[index]
+                                        ['id'],
+                                      );
+                                      quantity--;
+
+                                      cartProviders
+                                          .updateQuantityById(
+                                        otherproductList[index]
+                                        ['id'],
+                                        quantity,
+                                      );
                                     });
                                   },
                                   child: Container(
-                                    padding: const EdgeInsets.all(5),
+                                    padding:
+                                    const EdgeInsets.all(5),
                                     decoration: BoxDecoration(
                                       borderRadius:
-                                      BorderRadius.circular(25),
-                                      color: ColorPalette.primaryColor,
+                                      BorderRadius.circular(
+                                          25),
+                                      color: ColorPalette
+                                          .primaryColor,
                                     ),
                                     child: const Icon(
                                       Icons.remove,
@@ -602,70 +554,50 @@ class _OtherProductsSectionState extends State<OtherProductsSection> {
                                     ),
                                   ),
                                 ),
+
+                                ///cart quantity
                                 Padding(
-                                  padding: const EdgeInsets.all(10.0),
+                                  padding:
+                                  const EdgeInsets.all(10.0),
                                   child: Text(
-                                    '${productQuantities[otherproductList[index]['id']]}',
-                                    style: fontStyle(18, Colors.black, FontWeight.w400,
+                                    '${int.parse(cartProviders.getProductQuantityById(otherproductList[index]['id']).toString())}',
+                                    style: fontStyle(
+                                      18,
+                                      const Color.fromARGB(
+                                          255, 184, 11, 11),
+                                      FontWeight.w400,
                                     ),
                                   ),
                                 ),
+
+                                ///inecrement cart quantity
                                 InkWell(
                                   onTap: () {
                                     setState(() {
-                                      productQuantities[otherproductList[index]['id']] =
-                                          productQuantities[otherproductList[index]['id']]! + 1;
-                                      var cartProvider = Provider.of<CartProvider>(context, listen: false);
-                                      CartItem? existingItem;
-                                      try {
-                                        existingItem = cartProvider.cartItems.firstWhere((item) => item.name == otherproductList[index]['name'],
-                                            );
-                                      } catch (e) {
-                                        existingItem = null;
-                                      }
-                                      if (existingItem != null) {
-                                        // If the item is already in the cart, increment its quantity
-                                        existingItem.quantity += 1;
-                                        // Notify listeners to update the UI
-                                        cartProvider.notifyListeners();// Show a SnackBar to notify the user about the quantity increment
-                                      } else {
-                                        // If the item is not in the cart, add it
-                                        var item = CartItem(
-                                          id: otherproductList[index]['id'] as int,
-                                          image: otherproductList[index]['image'] ?? 'default_image_path',
-                                          name: otherproductList[index]['name'] ?? 'Unknown Product',
-                                          sell_price: double.parse('${otherproductList[index]['sell_price'].replaceAll(',', '')}'),
-                                          after_discount_price: double.parse('${otherproductList[index]['after_discount_price'].replaceAll(',', '')}'),
-                                          company_name: otherproductList[index]
-                                          ['brand']['brand_name'] ??
-                                              'Unknown Company',
-                                          subtitle: otherproductList[index]['name'] ?? 'Unknown Product',
-                                          quantity: 1,
-                                          addedFromProductDetails: true,
-                                        );
-                                        // Add the item to the cartProvider
-                                        cartProvider.addToCart(item);
-                                        // Show a SnackBar to notify the user about the item being added to the cart
-                                        // if (mounted) {
-                                        //   ScaffoldMessenger.of(context).showSnackBar(
-                                        //     const SnackBar(
-                                        //         content: Text('Added to Cart')),
-                                        //   );
-                                        // }
-                                      }
-                                      // Update the product quantity in the map
-                                      updateProductQuantityInMap(
-                                          otherproductList[index]['id'],
-                                          productQuantities[otherproductList[index]['id']] ?? 0);
+                                      var quantity = cartProviders
+                                          .getProductQuantityById(
+                                        otherproductList[index]
+                                        ['id'],
+                                      );
+                                      quantity++;
+
+                                      cartProviders
+                                          .updateQuantityById(
+                                        otherproductList[index]
+                                        ['id'],
+                                        quantity,
+                                      );
                                     });
-                                    // Notify the CartProvider
-                                    // Provider.of<CartProvider>(context, listen: false).notifyListeners();
                                   },
                                   child: Container(
-                                    padding: const EdgeInsets.all(5),
+                                    padding:
+                                    const EdgeInsets.all(5),
                                     decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(25),
-                                      color: ColorPalette.primaryColor,
+                                      borderRadius:
+                                      BorderRadius.circular(
+                                          25),
+                                      color: ColorPalette
+                                          .primaryColor,
                                     ),
                                     child: const Icon(
                                       Icons.add,

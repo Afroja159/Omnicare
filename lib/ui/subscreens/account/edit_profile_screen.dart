@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously, avoid_print, unused_local_variable, prefer_conditional_assignment
+
 import 'dart:async';
 import 'dart:io';
 import 'package:flutter/material.dart';
@@ -222,7 +224,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       if (response.statusCode == 200) {
         final Map<String, dynamic> responseData = json.decode(response.body);
         final Map<String, dynamic> authorization =
-            responseData['authorization'];
+        responseData['authorization'];
         return authorization['token'];
       } else {
         return null;

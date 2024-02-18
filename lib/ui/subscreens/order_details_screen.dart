@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously, prefer_const_declarations, unused_element, avoid_print, unnecessary_null_comparison
+
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -17,8 +19,8 @@ class OrderDetailsScreen extends StatefulWidget {
   final String orderStatus; // Add orderStatus parameter
   const OrderDetailsScreen({Key? key, required this.orderId, required this.orderStatus})
       : super(
-          key: key,
-        );
+    key: key,
+  );
 
   @override
   State<OrderDetailsScreen> createState() => _OrderDetailsScreenState();
@@ -103,7 +105,7 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
       if (response.statusCode == 200) {
         final Map<String, dynamic> responseData = json.decode(response.body);
         final Map<String, dynamic> authorization =
-            responseData['authorization'];
+        responseData['authorization'];
         return authorization['token'];
       } else {
         return null;
@@ -156,107 +158,107 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
     );
   }
   Widget _buildOrderDetails() {
-      return SingleChildScrollView(
-        child: isLoading
-            ? const ShimmerWidget()
-            : Column(
-          children: [
-            // Container(
-            //   height: 30,
-            //   decoration: BoxDecoration(
-            //     borderRadius: BorderRadius.circular(5),
-            //     color: Colors.red[50],
-            //   ),
-            //   child: Center(
-            //     child: Text(
-            //       "Once the order is confirmed, it will not be cancelled",
-            //       style: TextStyle(
-            //         color: Colors.red,
-            //         fontWeight: FontWeight.w600,
-            //       ),
-            //     ),
-            //   ),
-            // ),
-            // SizedBox(height: 20.h),
-            _buildTimeline(),
-            SizedBox(height: 20.h),
-            Container(
-              margin: EdgeInsets.symmetric(vertical: 10.h),
-              padding: EdgeInsets.symmetric(
-                horizontal: 20.w,
-                vertical: 10.h,
-              ),
-              height: 100.h,
-              width: 328.w,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(10.r),
-                border: Border.all(color: const Color(0xffB7D4FF)),
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text('Order ID: #OR- ${orderDetails['order']['id']}'),
-                      Text(
-                          'Order Date: ${orderDetails['order']['order_date']}'),
-                      Text(
-                          'Payment Status: ${orderDetails['order']['payment_status']}'),
-                      Text(
-                          'Delivery Date: ${orderDetails['order']['delivery_date']}'),
-                    ],
-                  ),
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text('৳ ${orderDetails['order']['order_amount']}'),
-                      Text(
-                        '${orderDetails['order']['order_status'].toUpperCase()}',
-                        style: TextStyle(
-                          color: _getStatusColor(
-                              orderDetails['order']['order_status']),
-                        ),
+    return SingleChildScrollView(
+      child: isLoading
+          ? const ShimmerWidget()
+          : Column(
+        children: [
+          // Container(
+          //   height: 30,
+          //   decoration: BoxDecoration(
+          //     borderRadius: BorderRadius.circular(5),
+          //     color: Colors.red[50],
+          //   ),
+          //   child: Center(
+          //     child: Text(
+          //       "Once the order is confirmed, it will not be cancelled",
+          //       style: TextStyle(
+          //         color: Colors.red,
+          //         fontWeight: FontWeight.w600,
+          //       ),
+          //     ),
+          //   ),
+          // ),
+          // SizedBox(height: 20.h),
+          _buildTimeline(),
+          SizedBox(height: 20.h),
+          Container(
+            margin: EdgeInsets.symmetric(vertical: 10.h),
+            padding: EdgeInsets.symmetric(
+              horizontal: 20.w,
+              vertical: 10.h,
+            ),
+            height: 100.h,
+            width: 328.w,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(10.r),
+              border: Border.all(color: const Color(0xffB7D4FF)),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('Order ID: #OR- ${orderDetails['order']['id']}'),
+                    Text(
+                        'Order Date: ${orderDetails['order']['order_date']}'),
+                    Text(
+                        'Payment Status: ${orderDetails['order']['payment_status']}'),
+                    Text(
+                        'Delivery Date: ${orderDetails['order']['delivery_date']}'),
+                  ],
+                ),
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('৳ ${orderDetails['order']['order_amount']}'),
+                    Text(
+                      '${orderDetails['order']['order_status'].toUpperCase()}',
+                      style: TextStyle(
+                        color: _getStatusColor(
+                            orderDetails['order']['order_status']),
                       ),
-                    ],
-                  ),
-                ],
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          for (var item in orderDetails['order_items']) _buildOrderItem(item),
+          SizedBox(height: 20.h),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                "Shipping charge:",
+                style: fontStyle(12, Colors.black, FontWeight.w400),
               ),
-            ),
-            for (var item in orderDetails['order_items']) _buildOrderItem(item),
-            SizedBox(height: 20.h),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  "Shipping charge:",
-                  style: fontStyle(12, Colors.black, FontWeight.w400),
-                ),
-                Text(
-                  '৳ ${orderDetails['order']['ship_charge']}',
-                  style: fontStyle(12, Colors.black, FontWeight.w500),
-                ),
-              ],
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  "Total:",
-                  style: fontStyle(
-                      12, ColorPalette.primaryColor, FontWeight.w500),
-                ),
-                Text(
-                  '৳ ${orderDetails['order']['order_amount']}',
-                  style:
-                  fontStyle(12.sp, ColorPalette.primaryColor, FontWeight.w500),
-                ),
-              ],
-            ),
-          ],
-        ),
-      );
+              Text(
+                '৳ ${orderDetails['order']['ship_charge']}',
+                style: fontStyle(12, Colors.black, FontWeight.w500),
+              ),
+            ],
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                "Total:",
+                style: fontStyle(
+                    12, ColorPalette.primaryColor, FontWeight.w500),
+              ),
+              Text(
+                '৳ ${orderDetails['order']['order_amount']}',
+                style:
+                fontStyle(12.sp, ColorPalette.primaryColor, FontWeight.w500),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
   }
   Widget _buildOrderItem(Map<String, dynamic> item) {
     // Ensure that the price and quantity are converted to numbers
@@ -308,54 +310,54 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  '${item['product']['name'].split(' ').first}...',
-                  style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500),
-                ),
-                Text('৳ ${item['product']['after_discount_price']}'),
-                Text(
-                  '৳ ${item['product']['sell_price']}',
-                  style: const TextStyle(
-                    fontSize: 11,
-                    color: Colors.grey,
-                    fontWeight: FontWeight.w400,
-                    decoration: TextDecoration.lineThrough,
-                    decorationColor: Colors.red,
-                    decorationThickness: 3,
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    '${item['product']['name'].split(' ').first}...',
+                    style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500),
                   ),
-                ),
-              ],
-            ),
-            SizedBox(
-              width: 6.w,
-            ),
-            Column(
-              children: [
-                const Text(
-                  'Quantity',
-                  style: TextStyle(fontWeight: FontWeight.w500, fontSize: 12),
-                ),
-                Text('${item['demand_quantity']}')
-              ],
-            ),
-            SizedBox(
-              width: 6.w,
-            ),
-            Column(
-              children: [
-                const Text(
-                  'Subtotal',
-                  style: TextStyle(fontWeight: FontWeight.w500, fontSize: 12),
-                ),
+                  Text('৳ ${item['product']['after_discount_price']}'),
+                  Text(
+                    '৳ ${item['product']['sell_price']}',
+                    style: const TextStyle(
+                      fontSize: 11,
+                      color: Colors.grey,
+                      fontWeight: FontWeight.w400,
+                      decoration: TextDecoration.lineThrough,
+                      decorationColor: Colors.red,
+                      decorationThickness: 3,
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(
+                width: 6.w,
+              ),
+              Column(
+                children: [
+                  const Text(
+                    'Quantity',
+                    style: TextStyle(fontWeight: FontWeight.w500, fontSize: 12),
+                  ),
+                  Text('${item['demand_quantity']}')
+                ],
+              ),
+              SizedBox(
+                width: 6.w,
+              ),
+              Column(
+                children: [
+                  const Text(
+                    'Subtotal',
+                    style: TextStyle(fontWeight: FontWeight.w500, fontSize: 12),
+                  ),
 
-                // Display the calculated subtotal value
-                Text('৳ $subtotal'),
-              ],
-            ),
-          ],),
+                  // Display the calculated subtotal value
+                  Text('৳ $subtotal'),
+                ],
+              ),
+            ],),
           // TextButton(
           //     onPressed: () {},
           //     child: Text(

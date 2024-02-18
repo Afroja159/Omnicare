@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print, unused_element, use_build_context_synchronously
+
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -146,7 +148,7 @@ class _OrderListScreenState extends State<OrderListScreen> {
         ),
         body: RefreshIndicator(
           onRefresh: () async {
-              await _fetchOrderData();
+            await _fetchOrderData();
           },
           child: SingleChildScrollView(
             child: Padding(
@@ -228,28 +230,4 @@ class _OrderListScreenState extends State<OrderListScreen> {
         return Colors.black; // Change to your default color
     }
   }
-  // Widget _buildShimmerList() {
-  //   return Column(
-  //     children: List.generate(
-  //       5,
-  //           (index) => Shimmer.fromColors(
-  //         baseColor: Colors.grey[300]!,
-  //         highlightColor: Colors.grey[100]!,
-  //         child: Container(
-  //           margin: EdgeInsets.symmetric(vertical: 10.h),
-  //           padding: EdgeInsets.symmetric(
-  //             horizontal: 20.w,
-  //             vertical: 10.h,
-  //           ),
-  //           height: 100.h,
-  //           width: 328.w,
-  //           decoration: BoxDecoration(
-  //             borderRadius: BorderRadius.circular(10.r),
-  //             color: Colors.white,
-  //           ),
-  //         ),
-  //       ),
-  //     ),
-  //   );
-  // }
 }

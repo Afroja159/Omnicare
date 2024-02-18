@@ -1,3 +1,5 @@
+// ignore_for_file: no_leading_underscores_for_local_identifiers, deprecated_member_use, prefer_const_constructors, avoid_print, invalid_use_of_visible_for_testing_member, invalid_use_of_protected_member, unused_local_variable
+
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -71,7 +73,7 @@ class _CartScreenState extends State<CartScreen> {
                         children: [
                           Image.asset(
                             ImageAssets
-                                .emptyCartPNG, // Provide the path to your default image
+                                .emptyCartPNG,
                             fit: BoxFit.contain,
                           ),
                           SizedBox(
@@ -87,19 +89,19 @@ class _CartScreenState extends State<CartScreen> {
                             ),
                             onPressed: () {
                               Get.offAll(
-                                BottomNavBarScreen(),
+                                    ()=> BottomNavBarScreen(),
                               );
                             },
                             child: Text(
                               "Continue Shopping",
                               style:
-                                  fontStyle(14.sp, Colors.white, FontWeight.w400),
+                              fontStyle(14.sp, Colors.white, FontWeight.w400),
                             ),
                           ),
                         ],
                       )
                     else
-                      // Display selected products
+                    // Display selected products
                       for (var cartItem in cartItems)
                         CartItemWidget(
                           cartItem: cartItem,
@@ -127,7 +129,7 @@ class _CartScreenState extends State<CartScreen> {
                               children: [
                                 Row(
                                   mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
+                                  MainAxisAlignment.spaceBetween,
                                   children: [
                                     Text(
                                       "All Product Price:",
@@ -141,7 +143,7 @@ class _CartScreenState extends State<CartScreen> {
                                 ),
                                 Row(
                                   mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
+                                  MainAxisAlignment.spaceBetween,
                                   children: [
                                     Text(
                                       "After Discount:",

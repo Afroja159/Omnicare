@@ -1,4 +1,7 @@
+// ignore_for_file: avoid_print, use_build_context_synchronously, non_constant_identifier_names, invalid_use_of_visible_for_testing_member, invalid_use_of_protected_member, unused_element
+
 import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -6,14 +9,14 @@ import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:omnicare_app/Auth/login_screen.dart';
 import 'package:omnicare_app/Model/cart_model.dart';
-import 'package:omnicare_app/services/button_provider.dart';
 import 'package:omnicare_app/const/custom_widgets.dart';
+import 'package:omnicare_app/services/button_provider.dart';
 import 'package:omnicare_app/services/cart_provider.dart';
 import 'package:omnicare_app/ui/network_checker_screen/network_checker_screen.dart';
-import 'package:omnicare_app/ui/screens/cart_screen.dart';
 import 'package:omnicare_app/ui/subscreens/product_details_screen.dart';
 import 'package:omnicare_app/ui/utils/color_palette.dart';
 import 'package:omnicare_app/ui/utils/image_assets.dart';
+import 'package:omnicare_app/ui/widgets/home/see_offer_product_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -25,12 +28,13 @@ class OfferedProductSection extends StatefulWidget {
   @override
   State<OfferedProductSection> createState() => _OfferedProductSectionState();
 }
+
 class _OfferedProductSectionState extends State<OfferedProductSection> {
   List<bool> isFavouriteList = [];
   List<CartItem> cartItems = [];
   List<dynamic> offeredproductsList = [];
   bool inProgress = false;
-  bool showAllProducts = false;
+  //bool showAllProducts = false;
   bool showQuantityButtons = false;
   int quantity = 0;
   // Map to store quantity for each product
@@ -42,12 +46,14 @@ class _OfferedProductSectionState extends State<OfferedProductSection> {
     fetchWishlist();
     AllProducts();
   }
+
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     // Fetch wishlist every time the screen is opened
     fetchWishlist();
   }
+
   Future<void> fetchWishlist() async {
     try {
       final String? authToken = await _getAccessToken();
@@ -62,15 +68,16 @@ class _OfferedProductSectionState extends State<OfferedProductSection> {
       if (response.statusCode == 200) {
         final responseData = jsonDecode(response.body);
         // Iterate through the wishlist items and add a timestamp for each item
-        if(mounted){
+        if (mounted) {
           setState(() {
-            _wishlistItems = List<Map<String, dynamic>>.from(responseData['data']).map((item) {
-              return {...item};
-            }).toList();
-          }
-        );}
+            _wishlistItems =
+                List<Map<String, dynamic>>.from(responseData['data'])
+                    .map((item) {
+                  return {...item};
+                }).toList();
+          });
+        }
         // Sort the wishlist items based on the timestamp, with the latest added item appearing first
-
       }
     } catch (error) {
       print('Error: $error');
@@ -83,20 +90,21 @@ class _OfferedProductSectionState extends State<OfferedProductSection> {
       );
     }
   }
+
   void AllProducts() async {
     inProgress = true;
     setState(() {});
     try {
       final response =
-          await http.get(Uri.parse('https://app.omnicare.com.bd/api'));
+      await http.get(Uri.parse('https://app.omnicare.com.bd/api'));
       if (response.statusCode == 200) {
         final json = jsonDecode(response.body);
-       if(mounted){
-         setState(() {
-           offeredproductsList = json['offered_products'];
-           isFavouriteList = List.filled(offeredproductsList.length, false);
-         });
-       }
+        if (mounted) {
+          setState(() {
+            offeredproductsList = json['offered_products'];
+            isFavouriteList = List.filled(offeredproductsList.length, false);
+          });
+        }
         print(offeredproductsList);
       } else {
         print(
@@ -109,6 +117,7 @@ class _OfferedProductSectionState extends State<OfferedProductSection> {
     setState(() {});
     Provider.of<CartProvider>(context, listen: false).notifyListeners();
   }
+
   Future<void> addToWishlist(int productId) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     final String? accessToken = prefs.getString('accessToken');
@@ -150,6 +159,7 @@ class _OfferedProductSectionState extends State<OfferedProductSection> {
       );
     }
   }
+
   Future<void> removeFromWishlist(int wishlistId) async {
     try {
       final String? authToken = await _getAccessToken();
@@ -157,7 +167,8 @@ class _OfferedProductSectionState extends State<OfferedProductSection> {
         print('Authorization token is missing.');
         return;
       }
-      final Uri url = Uri.parse('https://app.omnicare.com.bd/api/removeFromWishlist/$wishlistId');
+      final Uri url = Uri.parse(
+          'https://app.omnicare.com.bd/api/removeFromWishlist/$wishlistId');
       final response = await http.get(
         url,
         headers: {'Authorization': 'Bearer $authToken'},
@@ -169,7 +180,8 @@ class _OfferedProductSectionState extends State<OfferedProductSection> {
           _wishlistItems.removeWhere((item) => item['id'] == wishlistId);
         });
       } else {
-        print('Failed to remove product from wishlist. Status code: ${response.statusCode}');
+        print(
+            'Failed to remove product from wishlist. Status code: ${response.statusCode}');
       }
     } catch (error) {
       print('Error: $error');
@@ -182,6 +194,7 @@ class _OfferedProductSectionState extends State<OfferedProductSection> {
       );
     }
   }
+
   void updateFavoriteStatus(List<dynamic> wishlistData) {
     // Initialize a set to store the product IDs present in the wishlist
     Set<int> wishlistProductIds = {};
@@ -204,6 +217,7 @@ class _OfferedProductSectionState extends State<OfferedProductSection> {
       }
     }
   }
+
   Future<void> _handleTokenRefresh(Function onRefreshComplete) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     final String? refreshToken = prefs.getString('refreshToken');
@@ -223,12 +237,14 @@ class _OfferedProductSectionState extends State<OfferedProductSection> {
       }
     }
   }
+
   Future<String?> _getAccessToken() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     return prefs.getString('accessToken');
   }
+
   Future<String?> _refreshToken(String refreshToken) async {
-    final String apiUrl = 'https://app.omnicare.com.bd/api/refresh';
+    const String apiUrl = 'https://app.omnicare.com.bd/api/refresh';
     try {
       final response = await http.post(
         Uri.parse(apiUrl),
@@ -238,7 +254,8 @@ class _OfferedProductSectionState extends State<OfferedProductSection> {
       );
       if (response.statusCode == 200) {
         final Map<String, dynamic> responseData = json.decode(response.body);
-        final Map<String, dynamic> authorization = responseData['authorization'];
+        final Map<String, dynamic> authorization =
+        responseData['authorization'];
         return authorization['token'];
       } else {
         return null;
@@ -248,6 +265,7 @@ class _OfferedProductSectionState extends State<OfferedProductSection> {
       return null;
     }
   }
+
   Future<void> _checkNetworkAndLoggedIn() async {
     bool hasNetwork = await checkNetwork();
     bool userLoggedIn = await isLoggedIn();
@@ -258,6 +276,7 @@ class _OfferedProductSectionState extends State<OfferedProductSection> {
       Get.to(() => const NetworkCheckScreen());
     }
   }
+
   void addToCart(int index) {
     var cartProvider = Provider.of<CartProvider>(context, listen: false);
     var existingItem = cartItems.firstWhere(
@@ -301,38 +320,22 @@ class _OfferedProductSectionState extends State<OfferedProductSection> {
         id: productId,
         image: offeredproductsList[index]['image'] ?? 'default_image_path',
         name: offeredproductsList[index]['name'] ?? 'Unknown Product',
-        sell_price: double.parse('${offeredproductsList[index]['sell_price'].replaceAll(',', '')}'),
+        sell_price: double.parse(
+            '${offeredproductsList[index]['sell_price'].replaceAll(',', '')}'),
         after_discount_price: double.parse(
             '${offeredproductsList[index]['after_discount_price'].replaceAll(',', '')}'),
-        company_name: offeredproductsList[index]['brand']['brand_name'] ?? 'Unknown Company',
+        company_name: offeredproductsList[index]['brand']['brand_name'] ??
+            'Unknown Company',
         subtitle: offeredproductsList[index]['name'] ?? 'Unknown Product',
         quantity: 1,
         addedFromProductDetails: true,
       );
       cartProvider.addToCart(item);
       cartProvider.updateQuantity(productId, 1);
-      // ScaffoldMessenger.of(context).showSnackBar(
-      //   SnackBar(
-      //     content: Container(
-      //       height: 30.h,
-      //       child: Row(
-      //         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      //         children: [
-      //           const Text('Added to cart'),
-      //           TextButton(
-      //             onPressed: () {
-      //               Get.to(const CartScreen());
-      //             },
-      //             child: const Text('View', style: TextStyle(color: Colors.yellow)),
-      //           )
-      //         ],
-      //       ),
-      //     ),
-      //   ),
-      // );
       context.read<QuantityButtonsProvider>().setShowQuantityButtons(false);
     }
   }
+
   // This method updates the quantity in the productQuantities map
   void updateProductQuantityInMap(int productId, int newQuantity) {
     setState(() {
@@ -346,11 +349,9 @@ class _OfferedProductSectionState extends State<OfferedProductSection> {
       }
     });
   }
+
   @override
   Widget build(BuildContext context) {
-    List<dynamic> displayedProducts = showAllProducts
-        ? offeredproductsList
-        : offeredproductsList.take(2).toList();
     cartItems = Provider.of<CartProvider>(context).cartItems;
     final favoriteProvider = Provider.of<FavoriteProvider>(context);
     return ChangeNotifierProvider(
@@ -358,367 +359,349 @@ class _OfferedProductSectionState extends State<OfferedProductSection> {
         return QuantityButtonsProvider();
       },
       child: Column(
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      "Offers Product",
-                      style: fontStyle(12.sp, Colors.black, FontWeight.w400),
-                    ),
-                    TextButton(
-                      onPressed: () {
-                        setState(() {
-                          showAllProducts = !showAllProducts;
-                        });
-                      },
-                      child: Text(
-                        showAllProducts ? "Show less" : "See all",
-                        style: fontStyle(12.sp, Colors.black, FontWeight.w400),
-                      ),
-                    )
-                  ],
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                "Offers Product",
+                style: fontStyle(12.sp, Colors.black, FontWeight.w400),
+              ),
+              TextButton(
+                onPressed: () {
+                  setState(() {
+                    Get.to(() => const SeeOfferedProductScreen());
+                  });
+                },
+                child: Text(
+                  "See all",
+                  style: fontStyle(12.sp, Colors.black, FontWeight.w400),
                 ),
-                Padding(
-                  padding: EdgeInsets.symmetric(vertical: 5.h),
-                  child: GridView.builder(
-                    physics: const NeverScrollableScrollPhysics(),
-                    shrinkWrap: true,
-                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 2,
-                        crossAxisSpacing: 15,
-                        childAspectRatio: 0.60),
-                    itemCount: displayedProducts.length,
-                    itemBuilder: (context, index) {
-                      return Stack(
-                        children: [
-                          InkWell(
-                          onTap: () {
-                            Get.to(ProductDetailsScreen(
+              )
+            ],
+          ),
+          SizedBox(
+            height: 260.h,
+            child: Padding(
+              padding: EdgeInsets.symmetric(vertical: 5.h),
+              child: ListView.builder(
+                shrinkWrap: true,
+                scrollDirection: Axis.horizontal,
+                itemCount: offeredproductsList.length,
+                itemBuilder: (context, index) {
+                  var cartProviders =
+                  Provider.of<CartProvider>(context, listen: false);
+                  return Stack(
+                    children: [
+                      InkWell(
+                        onTap: () {
+                          Get.to(
+                                () => ProductDetailsScreen(
                               productDetails: offeredproductsList[index],
-                            ));
-                          },
-                          child: Container(
-                            padding: EdgeInsets.all(8.w),
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(5.r),
-                              color: ColorPalette.cardColor,
-                              border: Border.all(color: ColorPalette.primaryColor),
-                              boxShadow: const [
-                                BoxShadow(
-                                  blurRadius: 4,
-                                  color: Colors.black12,
-                                  offset: Offset(0, 2),
-                                ),
-                              ],
                             ),
-                            child: Column(
-                              children: [
-                                Expanded(
-                                  flex: 8,
-                                  child: Image.network(
-                                    '${offeredproductsList[index]['image']}',
-                                    errorBuilder: (context, error, stackTrace) {
-                                      return Image.asset(ImageAssets.productJPG, scale: 2,);
-                                    },
-                                  ),
+                          );
+                        },
+                        child: Container(
+                          padding: EdgeInsets.all(8.w),
+                          margin: EdgeInsets.only(right: 10.w),
+                          width: 160.w,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(5.r),
+                            color: ColorPalette.cardColor,
+                            border:
+                            Border.all(color: ColorPalette.primaryColor),
+                            boxShadow: const [
+                              BoxShadow(
+                                blurRadius: 4,
+                                color: Colors.black12,
+                                offset: Offset(0, 2),
+                              ),
+                            ],
+                          ),
+                          child: Column(
+                            children: [
+                              Expanded(
+                                flex: 8,
+                                child: Image.network(
+                                  '${offeredproductsList[index]['image']}',
+                                  errorBuilder: (context, error, stackTrace) {
+                                    return Image.asset(
+                                      ImageAssets.productJPG,
+                                      scale: 2,
+                                    );
+                                  },
                                 ),
-                                SizedBox(height: 8.h),
-                                Expanded(
-                                  flex: 10,
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Text(
-                                        '${offeredproductsList[index]['name']} - ${offeredproductsList[index]['brand']['brand_name'].split(' ').first}',
-                                        style: fontStyle(12, Colors.black, FontWeight.w500,
-                                        ),
+                              ),
+                              SizedBox(height: 8.h),
+                              Expanded(
+                                flex: 10,
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  mainAxisAlignment:
+                                  MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      '${offeredproductsList[index]['name']} - ${offeredproductsList[index]['brand']['brand_name'].split(' ').first}',
+                                      maxLines: 2,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: fontStyle(
+                                        12,
+                                        Colors.black,
+                                        FontWeight.w500,
                                       ),
-                                      // Text(
-                                      //   '${offeredproductsList[index]['brand']['brand_name'].split(' ').take(3).join(' ')}',
-                                      //   style: fontStyle(
-                                      //       12, Colors.black, FontWeight.w400),
-                                      // ),
-                                      Text(
-                                        '৳${offeredproductsList[index]['after_discount_price']}',
-                                        style: fontStyle(
-                                            12.sp, Colors.black, FontWeight.w600),
-                                      ),
-                                      Row(
-                                        children: [
-                                          Text(
-                                            '৳${offeredproductsList[index]['sell_price']}',
-                                            style: const TextStyle(
-                                                fontSize: 12,
-                                                color: Colors.grey,
-                                                fontWeight: FontWeight.w400,
-                                                decoration:
-                                                TextDecoration.lineThrough,
-                                                decorationColor: Colors.red,
-                                                decorationThickness: 3),
+                                    ),
+
+                                    Text(
+                                      '৳${offeredproductsList[index]['after_discount_price']}',
+                                      style: fontStyle(
+                                          12.sp, Colors.black, FontWeight.w600),
+                                    ),
+                                    Row(
+                                      children: [
+                                        Text(
+                                          '৳${offeredproductsList[index]['sell_price']}',
+                                          style: const TextStyle(
+                                            fontSize: 12,
+                                            color: Colors.grey,
+                                            fontWeight: FontWeight.w400,
+                                            decoration:
+                                            TextDecoration.lineThrough,
+                                            decorationColor: Colors.red,
+                                            decorationThickness: 3,
                                           ),
-                                          SizedBox(width: 9.w,),
-                                          Row(
-                                            children: [
+                                        ),
+                                        SizedBox(width: 9.w),
+                                        Row(
+                                          children: [
+                                            Text(
+                                              '৳${double.parse(offeredproductsList[index]['discount']).toStringAsFixed(2)}',
+                                              style: fontStyle(12, Colors.green,
+                                                  FontWeight.w600),
+                                            ),
+                                            if (offeredproductsList[index]
+                                            ['discount_type']
+                                                ?.toLowerCase() ==
+                                                'percent')
                                               Text(
-                                                '৳${double.parse(offeredproductsList[index]['discount']).toStringAsFixed(2)}',
-                                                style: fontStyle(12, Colors.green,
+                                                '% Off',
+                                                style: fontStyle(
+                                                    12,
+                                                    Colors.green,
                                                     FontWeight.w600),
                                               ),
-                                              if (offeredproductsList[index]['discount_type']?.toLowerCase() == 'percent')
-                                                Text('% Off',
-                                                  style: fontStyle(12, Colors.green, FontWeight.w600),
+                                            if (offeredproductsList[index]
+                                            ['discount_type']
+                                                ?.toLowerCase() !=
+                                                'percent')
+                                              Text(
+                                                ' ${offeredproductsList[index]['discount_type']}',
+                                                style: fontStyle(
+                                                    11,
+                                                    Colors.green,
+                                                    FontWeight.w600),
+                                              ),
+                                          ],
+                                        ),
+                                      ],
+                                    ),
+
+                                    // Display either the "ADD" button or quantity control buttons
+                                    int.parse(cartProviders
+                                        .getProductQuantityById(
+                                        offeredproductsList[index]
+                                        ['id'])
+                                        .toString()) ==
+                                        0
+                                        ? InkWell(
+                                      onTap: () {
+                                        setState(() {
+                                          productQuantities[
+                                          offeredproductsList[index][
+                                          'id']] = (productQuantities[
+                                          offeredproductsList[
+                                          index]['id']] ??
+                                              0) +
+                                              1;
+                                          showQuantityButtons = true;
+                                        });
+                                        SchedulerBinding.instance
+                                            .addPostFrameCallback((_) {
+                                          addToCart(index);
+                                        });
+                                      },
+                                      child: Container(
+                                        height: 28.h,
+                                        width: 80.w,
+                                        padding: EdgeInsets.symmetric(
+                                          horizontal: 10.w,
+                                          vertical: 5.h,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color:
+                                          ColorPalette.primaryColor,
+                                          borderRadius:
+                                          BorderRadius.circular(5),
+                                        ),
+                                        child: Center(
+                                          child: Row(
+                                            mainAxisAlignment:
+                                            MainAxisAlignment
+                                                .spaceBetween,
+                                            children: [
+                                              Text(
+                                                'ADD',
+                                                style: fontStyle(
+                                                  12.sp,
+                                                  Colors.white,
+                                                  FontWeight.w400,
                                                 ),
-                                              if (offeredproductsList[index]['discount_type']?.toLowerCase() != 'percent')
-                                                Text(
-                                                  ' ${offeredproductsList[index]['discount_type']}',
-                                                  style: fontStyle(11, Colors.green, FontWeight.w600),
-                                                ),
+                                              ),
+                                              const Icon(
+                                                Icons.add,
+                                                color: Colors.white,
+                                                size: 18,
+                                              )
                                             ],
                                           ),
-                                        ],
+                                        ),
                                       ),
-                                      // Text(
-                                      //   '${offeredproductsList[index]['category']['category_name'] ?? 'Unknown Category'}',
-                                      //   style: fontStyle(
-                                      //       6.sp, Colors.black, FontWeight.w400),
-                                      // ),
+                                    )
+                                        : Row(
+                                      children: [
+                                        ///decrement cart quantity
+                                        InkWell(
+                                          onTap: () {
+                                            setState(() {
+                                              var quantity = cartProviders
+                                                  .getProductQuantityById(
+                                                offeredproductsList[index]
+                                                ['id'],
+                                              );
+                                              quantity--;
 
-                                      // Display either the "ADD" button or quantity control buttons
-                                      productQuantities[offeredproductsList[index]['id']] == 0 ||
-                                          productQuantities[offeredproductsList[index]['id']] == null
-                                          ? InkWell(
-                                        onTap: () {
-                                          setState(() {
-                                            productQuantities[offeredproductsList[index]['id']] = (productQuantities[offeredproductsList[index]['id']] ?? 0) + 1;
-                                            showQuantityButtons = true;
-                                          });
-                                          SchedulerBinding.instance!.addPostFrameCallback((_) {
-                                            addToCart(index);
-                                          });
-                                        },
-                                        child: Container(
-                                          height: 28.h,
-                                          width: 80.w,
-                                          padding: EdgeInsets.symmetric(
-                                            horizontal: 10.w,
-                                            vertical: 5.h,
-                                          ),
-                                          decoration: BoxDecoration(
-                                            color: ColorPalette.primaryColor,
-                                            borderRadius:
-                                            BorderRadius.circular(5),
-                                          ),
-                                          child: Center(
-                                            child: Row(
-                                              mainAxisAlignment:
-                                              MainAxisAlignment.spaceBetween,
-                                              children: [
-                                                Text(
-                                                  'ADD',
-                                                  style: fontStyle(
-                                                    12.sp,
-                                                    Colors.white,
-                                                    FontWeight.w400,
-                                                  ),
-                                                ),
-                                                const Icon(
-                                                  Icons.add,
-                                                  color: Colors.white,
-                                                  size: 18,
-                                                )
-                                              ],
+                                              cartProviders
+                                                  .updateQuantityById(
+                                                offeredproductsList[index]
+                                                ['id'],
+                                                quantity,
+                                              );
+                                            });
+                                          },
+                                          child: Container(
+                                            padding:
+                                            const EdgeInsets.all(5),
+                                            decoration: BoxDecoration(
+                                              borderRadius:
+                                              BorderRadius.circular(
+                                                  25),
+                                              color: ColorPalette
+                                                  .primaryColor,
+                                            ),
+                                            child: const Icon(
+                                              Icons.remove,
+                                              color: Colors.white,
                                             ),
                                           ),
                                         ),
-                                      )
-                                          : Row(
-                                        children: [
-                                          InkWell(
-                                            onTap: () {
-                                              setState(() {
-                                                if (productQuantities[offeredproductsList[index]['id']] != null &&
-                                                    productQuantities[offeredproductsList[index]['id']]! > 0) {
-                                                  productQuantities[offeredproductsList[index]['id']] =
-                                                      productQuantities[offeredproductsList[index]['id']]! - 1;
-                                                  if (productQuantities[offeredproductsList[index]['id']] == 0) {
-                                                    showQuantityButtons = false;
-                                                  }
-                                                }
-                                                var cartProvider =
-                                                Provider.of<CartProvider>(context,
-                                                    listen: false);
-                                                CartItem? existingItem;
-                                                try {
-                                                  existingItem =
-                                                      cartProvider.cartItems.firstWhere((item) => item.name == offeredproductsList[index]['name'],);
-                                                } catch (e) {
-                                                  existingItem = null;
-                                                }
-                                                if (existingItem != null) {
-                                                  // If the item is already in the cart, increment its quantity
-                                                  existingItem.quantity -= 1;
-                                                  // Notify listeners to update the UI
-                                                  cartProvider.notifyListeners();
-                                                } else {
-                                                  // If the item is not in the cart, add it
-                                                  var item = CartItem(
-                                                    id: offeredproductsList[index]['id'] as int,
-                                                    image: offeredproductsList[index]['image'] ?? 'default_image_path',
-                                                    name: offeredproductsList[index]['name'] ?? 'Unknown Product',
-                                                    sell_price: double.parse('${offeredproductsList[index]['sell_price'].replaceAll(',', '')}'),
-                                                    after_discount_price: double.parse('${offeredproductsList[index]['after_discount_price'].replaceAll(',', '')}'),
-                                                    company_name: offeredproductsList[index]['brand'] ['brand_name']?? 'Unknown Company',
-                                                    subtitle: offeredproductsList[index]['name'] ?? 'Unknown Product',
-                                                    quantity: 1,
-                                                    addedFromProductDetails: true,
-                                                  );
-                                                  // Add the item to the cartProvider
-                                                  cartProvider.addToCart(item);
-                                                  // Show a SnackBar to notify the user about the item being added to the cart
-                                                  // if (mounted) {
-                                                  //   ScaffoldMessenger.of(context).showSnackBar(
-                                                  //     const SnackBar(
-                                                  //         duration: Duration(milliseconds: 1),
-                                                  //         content: Text('Added to Cart')),
-                                                  //   );
-                                                  // }
-                                                }
-                                                // Notify the CartProvider
-                                                Provider.of<CartProvider>(context, listen: false).notifyListeners();
-                                                // Update the product quantity in the map
-                                                updateProductQuantityInMap(offeredproductsList[index]['id'],
-                                                    productQuantities[offeredproductsList[index]['id']] ?? 0);
-                                              });
-                                            },
-                                            child: Container(
-                                              padding: const EdgeInsets.all(5),
-                                              decoration: BoxDecoration(
-                                                borderRadius:
-                                                BorderRadius.circular(25),
-                                                color: ColorPalette.primaryColor,
-                                              ),
-                                              child: const Icon(
-                                                Icons.remove,
-                                                color: Colors.white,
-                                              ),
+
+                                        ///cart quantity
+                                        Padding(
+                                          padding:
+                                          const EdgeInsets.all(10.0),
+                                          child: Text(
+                                            '${int.parse(cartProviders.getProductQuantityById(offeredproductsList[index]['id']).toString())}',
+                                            style: fontStyle(
+                                              18,
+                                              const Color.fromARGB(
+                                                  255, 184, 11, 11),
+                                              FontWeight.w400,
                                             ),
                                           ),
-                                          Padding(
-                                            padding: const EdgeInsets.all(10.0),
-                                            child: Text(
-                                              '${productQuantities[offeredproductsList[index]['id']]}',
-                                              style: fontStyle(18, Colors.black, FontWeight.w400,
-                                              ),
+                                        ),
+
+                                        ///inecrement cart quantity
+                                        InkWell(
+                                          onTap: () {
+                                            setState(() {
+                                              var quantity = cartProviders
+                                                  .getProductQuantityById(
+                                                offeredproductsList[index]
+                                                ['id'],
+                                              );
+                                              quantity++;
+
+                                              cartProviders
+                                                  .updateQuantityById(
+                                                offeredproductsList[index]
+                                                ['id'],
+                                                quantity,
+                                              );
+                                            });
+                                          },
+                                          child: Container(
+                                            padding:
+                                            const EdgeInsets.all(5),
+                                            decoration: BoxDecoration(
+                                              borderRadius:
+                                              BorderRadius.circular(
+                                                  25),
+                                              color: ColorPalette
+                                                  .primaryColor,
+                                            ),
+                                            child: const Icon(
+                                              Icons.add,
+                                              color: Colors.white,
                                             ),
                                           ),
-                                          InkWell(
-                                            onTap: () {
-                                              setState(() {
-                                                productQuantities[offeredproductsList[index]['id']] = productQuantities[offeredproductsList[index]['id']]! + 1;
-                                                var cartProvider = Provider.of<CartProvider>(context, listen: false);
-                                                CartItem? existingItem;
-                                                try {
-                                                  existingItem = cartProvider.cartItems.firstWhere((item) => item.name == offeredproductsList[index]['name'],
-                                                      );
-                                                } catch (e) {
-                                                  existingItem = null;
-                                                }
-                                                if (existingItem != null) {
-                                                  // If the item is already in the cart, increment its quantity
-                                                  existingItem.quantity += 1;
-                                                  // Notify listeners to update the UI
-                                                  cartProvider.notifyListeners();
-                                                } else {
-                                                  // If the item is not in the cart, add it
-                                                  var item = CartItem(
-                                                    id: offeredproductsList[index]['id'] as int,
-                                                    image: offeredproductsList[index]['image'] ?? 'default_image_path',
-                                                    name: offeredproductsList[index]['name'] ?? 'Unknown Product',
-                                                    sell_price: double.parse('${offeredproductsList[index]['sell_price'].replaceAll(',', '')}'),
-                                                    after_discount_price: double.parse('${offeredproductsList[index]['after_discount_price'].replaceAll(',', '')}'),
-                                                    company_name: offeredproductsList[index]['brand'] ['brand_name']?? 'Unknown Company',
-                                                    subtitle: offeredproductsList[index]['name'] ?? 'Unknown Product',
-                                                    quantity: 1,
-                                                    addedFromProductDetails: true,
-                                                  );
-                                                  // Add the item to the cartProvider
-                                                  cartProvider.addToCart(item);
-                                                  // Show a SnackBar to notify the user about the item being added to the cart
-                                                  // if (mounted) {
-                                                  //   ScaffoldMessenger.of(context).showSnackBar(
-                                                  //     const SnackBar(
-                                                  //         content: Text('Added to Cart')),
-                                                  //   );
-                                                  // }
-                                                }
-                                                // Update the product quantity in the map
-                                                updateProductQuantityInMap(
-                                                    offeredproductsList[index]['id'],
-                                                    productQuantities[offeredproductsList[index]['id']] ?? 0);
-                                              });
-                                              // Notify the CartProvider
-                                              // Provider.of<CartProvider>(context, listen: false).notifyListeners();
-                                            },
-                                            child: Container(
-                                              padding: const EdgeInsets.all(5),
-                                              decoration: BoxDecoration(
-                                                borderRadius:
-                                                BorderRadius.circular(25),
-                                                color: ColorPalette.primaryColor,
-                                              ),
-                                              child: const Icon(
-                                                Icons.add,
-                                                color: Colors.white,
-                                              ),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ],
-                                  ),
-                                )
-                              ],
-                            ),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              )
+                            ],
                           ),
                         ),
+                      ),
                       Positioned(
-                      top: 10.h,
-                      right: 10.w,
+                        top: 10.h,
+                        right: 15.w,
                         child: GestureDetector(
                           onTap: () async {
                             // Toggle the favorite status in the provider
-                            favoriteProvider.toggleFavorite(offeredproductsList[index]['id']);
+                            favoriteProvider.toggleFavorite(
+                                offeredproductsList[index]['id']);
                             // Perform the appropriate action based on the updated status
-                            if (favoriteProvider.isFavorite(offeredproductsList[index]['id'])) {
+                            if (favoriteProvider
+                                .isFavorite(offeredproductsList[index]['id'])) {
                               // If the product is now in the wishlist, add it
-                              await addToWishlist(offeredproductsList[index]['id']);
+                              await addToWishlist(
+                                  offeredproductsList[index]['id']);
                             } else {
-                              int? wishlistId; // Initialize with null
+                              int? wishlistId;
 
-// Print _wishlistItems to ensure it contains the expected data
-                              print('_wishlistItems: $_wishlistItems');
-
-// Retrieve the wishlist ID from _wishlistItems
                               for (var item in _wishlistItems) {
                                 String productId = item['product_id'];
-                                int wishlistProductId = int.tryParse(productId) ?? -1;
+                                int wishlistProductId =
+                                    int.tryParse(productId) ?? -1;
 
                                 // Print productId and wishlistProductId to see their values
-                                print('productId: $productId, wishlistProductId: $wishlistProductId');
+                                print(
+                                    'productId: $productId, wishlistProductId: $wishlistProductId');
 
-                                if (wishlistProductId == offeredproductsList[index]['id']) {
+                                if (wishlistProductId ==
+                                    offeredproductsList[index]['id']) {
                                   wishlistId = item['id'];
                                   break;
                                 }
                               }
 
-// Print wishlistId to see if it was found
+                              // Print wishlistId to see if it was found
                               print('wishlistId: $wishlistId');
 
-// Pass the retrieved wishlist ID to removeFromWishlist
-                              if (wishlistId != null) { // Check if wishlistId was found
+                              // Pass the retrieved wishlist ID to removeFromWishlist
+                              if (wishlistId != null) {
+                                // Check if wishlistId was found
                                 await removeFromWishlist(wishlistId);
                               } else {
                                 print('Wishlist ID not found for the product.');
@@ -727,20 +710,32 @@ class _OfferedProductSectionState extends State<OfferedProductSection> {
                           },
                           child: Icon(
                             // Use isFavorite method to determine the initial state of the favorite icon
-                            favoriteProvider.isFavorite(offeredproductsList[index]['id'])
+                            favoriteProvider.isFavorite(
+                                offeredproductsList[index]['id'])
                                 ? Icons.favorite
                                 : Icons.favorite_border,
                             color: const Color(0xffE40404),
                           ),
                         ),
                       ),
-                      ]
-                      );
-                    },
-                  ),
-                )
-              ],
+                    ],
+                  );
+                },
+              ),
+              // child: GridView.builder(
+              //   shrinkWrap: true,
+              //   scrollDirection: Axis.horizontal,
+              //   gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              //     crossAxisCount: 1,
+              //     mainAxisSpacing: 10,
+              //     mainAxisExtent: 260,
+              //   ),
+
+              // ),
             ),
+          )
+        ],
+      ),
     );
   }
 }

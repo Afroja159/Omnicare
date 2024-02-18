@@ -1,20 +1,22 @@
+// ignore_for_file: use_build_context_synchronously, avoid_print, unused_element, invalid_use_of_visible_for_testing_member, invalid_use_of_protected_member
+
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:http/http.dart' as http;
 import 'package:omnicare_app/Auth/login_screen.dart';
 import 'package:omnicare_app/Model/cart_model.dart';
 import 'package:omnicare_app/const/bottom_navbar.dart';
-import 'package:omnicare_app/services/button_provider.dart';
 import 'package:omnicare_app/const/custom_widgets.dart';
+import 'package:omnicare_app/services/button_provider.dart';
 import 'package:omnicare_app/services/cart_provider.dart';
 import 'package:omnicare_app/ui/network_checker_screen/network_checker_screen.dart';
 import 'package:omnicare_app/ui/screens/cart_screen.dart';
-import 'package:omnicare_app/ui/screens/shimmer_widget.dart';
 import 'package:omnicare_app/ui/subscreens/product_details_screen.dart';
 import 'package:omnicare_app/ui/utils/color_palette.dart';
-import 'dart:convert';
-import 'package:http/http.dart' as http;
 import 'package:omnicare_app/ui/utils/image_assets.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -27,6 +29,7 @@ class SearchedProductScreen extends StatefulWidget {
   @override
   State<SearchedProductScreen> createState() => _SearchedProductScreenState();
 }
+
 class _SearchedProductScreenState extends State<SearchedProductScreen> {
   List<bool> isFavouriteList = [];
   bool isLoading = false;
@@ -46,12 +49,14 @@ class _SearchedProductScreenState extends State<SearchedProductScreen> {
     fetchWishlist();
     allProducts();
   }
+
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     // Fetch wishlist every time the screen is opened
     fetchWishlist();
   }
+
   Future<void> fetchWishlist() async {
     try {
       final String? authToken = await _getAccessToken();
@@ -67,9 +72,10 @@ class _SearchedProductScreenState extends State<SearchedProductScreen> {
         final responseData = jsonDecode(response.body);
         // Iterate through the wishlist items and add a timestamp for each item
         setState(() {
-          _wishlistItems = List<Map<String, dynamic>>.from(responseData['data']).map((item) {
-            return {...item, 'timestamp': DateTime.now()};
-          }).toList();
+          _wishlistItems =
+              List<Map<String, dynamic>>.from(responseData['data']).map((item) {
+                return {...item, 'timestamp': DateTime.now()};
+              }).toList();
         });
         // Sort the wishlist items based on the timestamp, with the latest added item appearing first
         _wishlistItems.sort((a, b) => b['timestamp'].compareTo(a['timestamp']));
@@ -95,36 +101,39 @@ class _SearchedProductScreenState extends State<SearchedProductScreen> {
       );
     }
   }
+
   void allProducts() async {
     try {
       setState(() {
         isLoading = true;
       });
-      final response = await http.get(Uri.parse('https://app.omnicare.com.bd/api'));
+      final response =
+      await http.get(Uri.parse('https://app.omnicare.com.bd/api'));
       if (response.statusCode == 200) {
         final json = jsonDecode(response.body);
         if (json['all_products'] is List) {
           setState(() {
-            allproductsList = List<Map<String, dynamic>>.from(json['all_products']);
-
+            allproductsList =
+            List<Map<String, dynamic>>.from(json['all_products']);
           });
           print(allproductsList);
         } else {
           print('Invalid data format for featured products.');
         }
       } else {
-        print('Failed to load company names. Status code: ${response.statusCode}');
+        print(
+            'Failed to load company names. Status code: ${response.statusCode}');
       }
     } catch (error) {
       print('Error: $error');
-    }
-    finally {
+    } finally {
       setState(() {
         isLoading = false;
       });
     }
     Provider.of<CartProvider>(context, listen: false).notifyListeners();
   }
+
   Future<void> addToWishlist(int productId) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     final String? accessToken = prefs.getString('accessToken');
@@ -174,7 +183,8 @@ class _SearchedProductScreenState extends State<SearchedProductScreen> {
         print('Authorization token is missing.');
         return;
       }
-      final Uri url = Uri.parse('https://app.omnicare.com.bd/api/removeFromWishlist/$wishlistId');
+      final Uri url = Uri.parse(
+          'https://app.omnicare.com.bd/api/removeFromWishlist/$wishlistId');
       final response = await http.get(
         url,
         headers: {'Authorization': 'Bearer $authToken'},
@@ -186,7 +196,8 @@ class _SearchedProductScreenState extends State<SearchedProductScreen> {
           _wishlistItems.removeWhere((item) => item['id'] == wishlistId);
         });
       } else {
-        print('Failed to remove product from wishlist. Status code: ${response.statusCode}');
+        print(
+            'Failed to remove product from wishlist. Status code: ${response.statusCode}');
       }
     } catch (error) {
       print('Error: $error');
@@ -199,6 +210,7 @@ class _SearchedProductScreenState extends State<SearchedProductScreen> {
       );
     }
   }
+
   void updateFavoriteStatus(List<dynamic> wishlistData) {
     // Initialize a set to store the product IDs present in the wishlist
     Set<int> wishlistProductIds = {};
@@ -221,6 +233,7 @@ class _SearchedProductScreenState extends State<SearchedProductScreen> {
       }
     }
   }
+
   Future<void> _handleTokenRefresh(Function onRefreshComplete) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     final String? refreshToken = prefs.getString('refreshToken');
@@ -242,12 +255,14 @@ class _SearchedProductScreenState extends State<SearchedProductScreen> {
       }
     }
   }
+
   Future<String?> _getAccessToken() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     return prefs.getString('accessToken');
   }
+
   Future<String?> _refreshToken(String refreshToken) async {
-    final String apiUrl = 'https://app.omnicare.com.bd/api/refresh';
+    const String apiUrl = 'https://app.omnicare.com.bd/api/refresh';
     try {
       final response = await http.post(
         Uri.parse(apiUrl),
@@ -257,7 +272,8 @@ class _SearchedProductScreenState extends State<SearchedProductScreen> {
       );
       if (response.statusCode == 200) {
         final Map<String, dynamic> responseData = json.decode(response.body);
-        final Map<String, dynamic> authorization = responseData['authorization'];
+        final Map<String, dynamic> authorization =
+        responseData['authorization'];
         return authorization['token'];
       } else {
         return null;
@@ -267,6 +283,7 @@ class _SearchedProductScreenState extends State<SearchedProductScreen> {
       return null;
     }
   }
+
   Future<void> _checkNetworkAndLoggedIn() async {
     bool hasNetwork = await checkNetwork();
     bool userLoggedIn = await isLoggedIn();
@@ -307,7 +324,8 @@ class _SearchedProductScreenState extends State<SearchedProductScreen> {
                   onPressed: () {
                     Get.to(const CartScreen());
                   },
-                  child: const Text('View', style: TextStyle(color: Colors.yellow)),
+                  child: const Text('View',
+                      style: TextStyle(color: Colors.yellow)),
                 )
               ],
             ),
@@ -321,10 +339,12 @@ class _SearchedProductScreenState extends State<SearchedProductScreen> {
         id: productId,
         image: searchResults[index]['image'] ?? 'default_image_path',
         name: searchResults[index]['name'] ?? 'Unknown Product',
-        sell_price: double.parse('${searchResults[index]['sell_price'].replaceAll(',', '')}'),
+        sell_price: double.parse(
+            '${searchResults[index]['sell_price'].replaceAll(',', '')}'),
         after_discount_price: double.parse(
             '${searchResults[index]['after_discount_price'].replaceAll(',', '')}'),
-        company_name: searchResults[index]['brand']['brand_name'] ?? 'Unknown Company',
+        company_name:
+        searchResults[index]['brand']['brand_name'] ?? 'Unknown Company',
         subtitle: 'Unknown',
         quantity: 1,
         addedFromProductDetails: true,
@@ -343,7 +363,8 @@ class _SearchedProductScreenState extends State<SearchedProductScreen> {
                   onPressed: () {
                     Get.to(const CartScreen());
                   },
-                  child: const Text('View', style: TextStyle(color: Colors.yellow)),
+                  child: const Text('View',
+                      style: TextStyle(color: Colors.yellow)),
                 )
               ],
             ),
@@ -353,6 +374,7 @@ class _SearchedProductScreenState extends State<SearchedProductScreen> {
       context.read<QuantityButtonsProvider>().setShowQuantityButtons(false);
     }
   }
+
   // This method updates the quantity in the productQuantities map
   void updateProductQuantityInMap(int productId, int newQuantity) {
     setState(() {
@@ -366,36 +388,41 @@ class _SearchedProductScreenState extends State<SearchedProductScreen> {
       }
     });
   }
+
   void searchProduct(String query) async {
     try {
       setState(() {
         isLoading = true;
       });
       final response = await http.post(
-        Uri.parse('https://app.omnicare.com.bd/api/search_product?query=$query'),
+        Uri.parse(
+            'https://app.omnicare.com.bd/api/search_product?query=$query'),
       );
       if (response.statusCode == 200) {
         final json = jsonDecode(response.body);
-        if (json['suggested_products'] != null && json['suggested_products'] is List) {
+        if (json['suggested_products'] != null &&
+            json['suggested_products'] is List) {
           setState(() {
-            searchResults = List<Map<String, dynamic>>.from(json['suggested_products']);
+            searchResults =
+            List<Map<String, dynamic>>.from(json['suggested_products']);
             isFavouriteList = List.filled(allproductsList.length, false);
           });
         } else {
           print('Invalid search results format.');
         }
       } else {
-        print('Failed to load search results. Status code: ${response.statusCode}');
+        print(
+            'Failed to load search results. Status code: ${response.statusCode}');
       }
     } catch (error) {
       print('Error during product search: $error');
-    }
-    finally {
+    } finally {
       setState(() {
         isLoading = false;
       });
     }
   }
+
   // void runFilter(String enteredKeyword) {
   //   if (enteredKeyword.isEmpty) {
   //     setState(() {
@@ -435,7 +462,8 @@ class _SearchedProductScreenState extends State<SearchedProductScreen> {
               flexibleSpace: FlexibleSpaceBar(
                 titlePadding: const EdgeInsets.only(bottom: 5),
                 title: Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 11, horizontal: 20),
+                  padding:
+                  const EdgeInsets.symmetric(vertical: 11, horizontal: 20),
                   child: Row(
                     children: [
                       IconButton(
@@ -467,13 +495,14 @@ class _SearchedProductScreenState extends State<SearchedProductScreen> {
                 ),
               ),
             ),
-         // Conditionally build either search results or featured products
+            // Conditionally build either search results or featured products
             searchResults.isNotEmpty
                 ? SliverPadding(
-              padding: EdgeInsets.symmetric(vertical: 20.h, horizontal: 15.w),
-
+              padding:
+              EdgeInsets.symmetric(vertical: 20.h, horizontal: 15.w),
               sliver: SliverGrid(
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                gridDelegate:
+                const SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 2,
                   crossAxisSpacing: 15,
                   childAspectRatio: 0.60,
@@ -489,9 +518,11 @@ class _SearchedProductScreenState extends State<SearchedProductScreen> {
               ),
             )
                 : SliverPadding(
-              padding: EdgeInsets.symmetric(vertical: 20.h, horizontal: 15.w),
+              padding:
+              EdgeInsets.symmetric(vertical: 20.h, horizontal: 15.w),
               sliver: SliverGrid(
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                gridDelegate:
+                const SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 2,
                   crossAxisSpacing: 15,
                   childAspectRatio: 0.60,
@@ -499,7 +530,8 @@ class _SearchedProductScreenState extends State<SearchedProductScreen> {
                 ),
                 delegate: SliverChildBuilderDelegate(
                       (context, index) {
-                    return buildProductCard(allproductsList[index], index);
+                    return buildProductCard(
+                        allproductsList[index], index);
                   },
                   childCount: allproductsList.length,
                 ),
@@ -512,13 +544,15 @@ class _SearchedProductScreenState extends State<SearchedProductScreen> {
   }
 
   Widget buildProductCard(Map<String, dynamic> product, int index) {
-    final favoriteProvider = Provider.of<FavoriteProvider>(context); // Retrieve FavoriteProvider instance
-    final productId = product['id'] as int; // Retrieve product ID
-    return  Stack(
+    final favoriteProvider = Provider.of<FavoriteProvider>(context);
+    final cartProvider = Provider.of<CartProvider>(context,
+        listen: false); // Retrieve FavoriteProvider instance
+    //final productId = product['id'] as int; // Retrieve product ID
+    return Stack(
       children: [
         InkWell(
           onTap: () {
-            Get.to(ProductDetailsScreen(productDetails: product));
+            Get.to(() => ProductDetailsScreen(productDetails: product));
           },
           child: Container(
             padding: EdgeInsets.all(8.w),
@@ -539,7 +573,6 @@ class _SearchedProductScreenState extends State<SearchedProductScreen> {
                 Expanded(
                   flex: 8,
                   child: InkWell(
-
                     child: Image.network(
                       product['image'],
                       errorBuilder: (context, error, stackTrace) {
@@ -560,6 +593,8 @@ class _SearchedProductScreenState extends State<SearchedProductScreen> {
                     children: [
                       Text(
                         '${product['name']} - ${product['brand']['brand_name'].split(' ').first}',
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
                         style: fontStyle(12, Colors.black, FontWeight.w500),
                       ),
                       Text(
@@ -585,17 +620,22 @@ class _SearchedProductScreenState extends State<SearchedProductScreen> {
                             children: [
                               Text(
                                 '৳${double.parse(product['discount']).toStringAsFixed(2)}',
-                                style: fontStyle(12.sp, Colors.green, FontWeight.w600),
+                                style: fontStyle(
+                                    12.sp, Colors.green, FontWeight.w600),
                               ),
-                              if (product['discount_type']?.toLowerCase() == 'percent')
+                              if (product['discount_type']?.toLowerCase() ==
+                                  'percent')
                                 Text(
                                   '% Off',
-                                  style: fontStyle(12.sp, Colors.green, FontWeight.w600),
+                                  style: fontStyle(
+                                      12.sp, Colors.green, FontWeight.w600),
                                 ),
-                              if (product['discount_type']?.toLowerCase() != 'percent')
+                              if (product['discount_type']?.toLowerCase() !=
+                                  'percent')
                                 Text(
                                   ' ${product['discount_type']} Off',
-                                  style: fontStyle(11.sp, Colors.green, FontWeight.w600),
+                                  style: fontStyle(
+                                      11.sp, Colors.green, FontWeight.w600),
                                 ),
                             ],
                           ),
@@ -603,17 +643,28 @@ class _SearchedProductScreenState extends State<SearchedProductScreen> {
                       ),
                       // Check if the index is within range before accessing searchResults
                       if (index < searchResults.length)
-                        productQuantities[searchResults[index]['id']] == 0 ||
-                            productQuantities[searchResults[index]['id']] == null
+                        int.parse(cartProvider
+                            .getProductQuantityById(
+                            searchResults[index]['id'])
+                            .toString()) ==
+                            0
+                        // productQuantities[searchResults[index]['id']] == 0 ||
+                        //     productQuantities[searchResults[index]['id']] == null
+
                             ? InkWell(
                           onTap: () {
                             setState(() {
-                              productQuantities[searchResults[index]['id']] =
-                                  (productQuantities[searchResults[index]['id']] ?? 0) + 1;
+                              productQuantities[searchResults[index]
+                              ['id']] = (productQuantities[
+                              searchResults[index]['id']] ??
+                                  0) +
+                                  1;
                               showQuantityButtons = true;
                             });
-                            SchedulerBinding.instance!.addPostFrameCallback((_) {
-                              addToCart(index); // Pass index of allproductsList
+                            SchedulerBinding.instance
+                                .addPostFrameCallback((_) {
+                              addToCart(
+                                  index); // Pass index of allproductsList
                             });
                           },
                           child: Container(
@@ -629,11 +680,13 @@ class _SearchedProductScreenState extends State<SearchedProductScreen> {
                             ),
                             child: Center(
                               child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment:
+                                MainAxisAlignment.spaceBetween,
                                 children: [
                                   Text(
                                     'ADD',
-                                    style: fontStyle(12.sp, Colors.white, FontWeight.w400),
+                                    style: fontStyle(12.sp, Colors.white,
+                                        FontWeight.w400),
                                   ),
                                   const Icon(
                                     Icons.add,
@@ -650,51 +703,93 @@ class _SearchedProductScreenState extends State<SearchedProductScreen> {
                             InkWell(
                               onTap: () {
                                 setState(() {
-                                  if (productQuantities[searchResults[index]['id']] != null &&
-                                      productQuantities[searchResults[index]['id']]! > 0) {
-                                    productQuantities[searchResults[index]['id']] =
-                                        productQuantities[searchResults[index]['id']]! - 1;
-                                    if (productQuantities[searchResults[index]['id']] == 0) {
-                                      showQuantityButtons = false;
-                                    }
-                                  }
-                                  var cartProvider = Provider.of<CartProvider>(context, listen: false);
-                                  CartItem? existingItem;
-                                  try {
-                                    existingItem = cartProvider.cartItems.firstWhere(
-                                          (item) => item.name == searchResults[index]['name'],
-                                    );
-                                  } catch (e) {
-                                    existingItem = null;
-                                  }
-                                  if (existingItem != null) {
-                                    // If the item is already in the cart, increment its quantity
-                                    existingItem.quantity -= 1;
-                                    // Notify listeners to update the UI
-                                    cartProvider.notifyListeners();
-                                  } else {
-                                    // If the item is not in the cart, add it
-                                    var item = CartItem(
-                                      id: searchResults[index]['id'] as int,
-                                      image: searchResults[index]['image'] ?? 'default_image_path',
-                                      name: searchResults[index]['name'] ?? 'Unknown Product',
-                                      sell_price: double.parse('${searchResults[index]['sell_price'].replaceAll(',', '')}'),
-                                      after_discount_price: double.parse('${searchResults[index]['after_discount_price'].replaceAll(',', '')}'),
-                                      company_name: searchResults[index] ['brand'] ['brand_name']?? 'Unknown Company',
-                                      subtitle: 'Unknown',
-                                      quantity: 1,
-                                      addedFromProductDetails: true,
-                                    );
-                                    // Add the item to the cartProvider
-                                    cartProvider.addToCart(item);
-                                  }
-                                  // Notify the CartProvider
-                                  Provider.of<CartProvider>(context, listen: false).notifyListeners();
-                                  // Update the product quantity in the map
-                                  updateProductQuantityInMap(
-                                      searchResults[index]['id'],
-                                      productQuantities[searchResults[index]['id']] ?? 0);
+                                  var quantity =
+                                  cartProvider.getProductQuantityById(
+                                    searchResults[index]['id'],
+                                  );
+                                  quantity--;
+
+                                  cartProvider.updateQuantityById(
+                                    searchResults[index]['id'],
+                                    quantity,
+                                  );
                                 });
+
+                                // setState(() {
+                                //   if (productQuantities[
+                                //               searchResults[index]
+                                //                   ['id']] !=
+                                //           null &&
+                                //       productQuantities[
+                                //               searchResults[index]
+                                //                   ['id']]! >
+                                //           0) {
+                                //     productQuantities[searchResults[index]
+                                //         ['id']] = productQuantities[
+                                //             searchResults[index]['id']]! -
+                                //         1;
+                                //     if (productQuantities[
+                                //             searchResults[index]['id']] ==
+                                //         0) {
+                                //       showQuantityButtons = false;
+                                //     }
+                                //   }
+                                //   var cartProvider =
+                                //       Provider.of<CartProvider>(context,
+                                //           listen: false);
+                                //   CartItem? existingItem;
+                                //   try {
+                                //     existingItem =
+                                //         cartProvider.cartItems.firstWhere(
+                                //       (item) =>
+                                //           item.name ==
+                                //           searchResults[index]['name'],
+                                //     );
+                                //   } catch (e) {
+                                //     existingItem = null;
+                                //   }
+                                //   if (existingItem != null) {
+                                //     // If the item is already in the cart, increment its quantity
+                                //     existingItem.quantity -= 1;
+                                //     // Notify listeners to update the UI
+                                //     cartProvider.notifyListeners();
+                                //   } else {
+                                //     // If the item is not in the cart, add it
+                                //     var item = CartItem(
+                                //       id: searchResults[index]['id']
+                                //           as int,
+                                //       image: searchResults[index]
+                                //               ['image'] ??
+                                //           'default_image_path',
+                                //       name: searchResults[index]
+                                //               ['name'] ??
+                                //           'Unknown Product',
+                                //       sell_price: double.parse(
+                                //           '${searchResults[index]['sell_price'].replaceAll(',', '')}'),
+                                //       after_discount_price: double.parse(
+                                //           '${searchResults[index]['after_discount_price'].replaceAll(',', '')}'),
+                                //       company_name: searchResults[index]
+                                //               ['brand']['brand_name'] ??
+                                //           'Unknown Company',
+                                //       subtitle: 'Unknown',
+                                //       quantity: 1,
+                                //       addedFromProductDetails: true,
+                                //     );
+                                //     // Add the item to the cartProvider
+                                //     cartProvider.addToCart(item);
+                                //   }
+                                //   // Notify the CartProvider
+                                //   Provider.of<CartProvider>(context,
+                                //           listen: false)
+                                //       .notifyListeners();
+                                //   // Update the product quantity in the map
+                                //   updateProductQuantityInMap(
+                                //       searchResults[index]['id'],
+                                //       productQuantities[
+                                //               searchResults[index]
+                                //                   ['id']] ??
+                                //           0);
+                                // });
                               },
                               child: Container(
                                 padding: const EdgeInsets.all(5),
@@ -708,59 +803,35 @@ class _SearchedProductScreenState extends State<SearchedProductScreen> {
                                 ),
                               ),
                             ),
+
+                            ///cart quantity
                             Padding(
                               padding: const EdgeInsets.all(10.0),
                               child: Text(
-                                '${productQuantities[searchResults[index]['id']]}',
+                                '${int.parse(cartProvider.getProductQuantityById(searchResults[index]['id']).toString())}',
                                 style: fontStyle(
                                   18,
-                                  Colors.black,
+                                  const Color.fromARGB(255, 184, 11, 11),
                                   FontWeight.w400,
                                 ),
                               ),
                             ),
+
+                            ///inecrement cart quantity
                             InkWell(
                               onTap: () {
                                 setState(() {
-                                  productQuantities[searchResults[index]['id']] =
-                                      productQuantities[searchResults[index]['id']]! + 1;
-                                  var cartProvider = Provider.of<CartProvider>(context, listen: false);
-                                  CartItem? existingItem;
-                                  try {
-                                    existingItem = cartProvider.cartItems.firstWhere(
-                                          (item) => item.name == searchResults[index]['name'],
-                                    );
-                                  } catch (e) {
-                                    existingItem = null;
-                                  }
-                                  if (existingItem != null) {
-                                    // If the item is already in the cart, increment its quantity
-                                    existingItem.quantity += 1;
-                                    // Notify listeners to update the UI
-                                    cartProvider.notifyListeners();
-                                  } else {
-                                    // If the item is not in the cart, add it
-                                    var item = CartItem(
-                                      id: searchResults[index]['id'] as int,
-                                      image: searchResults[index]['image'] ?? 'default_image_path',
-                                      name: searchResults[index]['name'] ?? 'Unknown Product',
-                                      sell_price: double.parse('${searchResults[index]['sell_price'].replaceAll(',', '')}'),
-                                      after_discount_price: double.parse('${searchResults[index]['after_discount_price'].replaceAll(',', '')}'),
-                                      company_name: searchResults[index] ['brand'] ['brand_name']?? 'Unknown Company',
-                                      subtitle: 'Unknown',
-                                      quantity: 1,
-                                      addedFromProductDetails: true,
-                                    );
-                                    // Add the item to the cartProvider
-                                    cartProvider.addToCart(item);
-                                  }
-                                  // Update the product quantity in the map
-                                  updateProductQuantityInMap(
-                                      searchResults[index]['id'],
-                                      productQuantities[searchResults[index]['id']] ?? 0);
+                                  var quantity =
+                                  cartProvider.getProductQuantityById(
+                                    searchResults[index]['id'],
+                                  );
+                                  quantity++;
+
+                                  cartProvider.updateQuantityById(
+                                    searchResults[index]['id'],
+                                    quantity,
+                                  );
                                 });
-                                // Notify the CartProvider
-                                Provider.of<CartProvider>(context, listen: false).notifyListeners();
                               },
                               child: Container(
                                 padding: const EdgeInsets.all(5),
@@ -806,7 +877,8 @@ class _SearchedProductScreenState extends State<SearchedProductScreen> {
                   int wishlistProductId = int.tryParse(productId) ?? -1;
 
                   // Print productId and wishlistProductId to see their values
-                  print('productId: $productId, wishlistProductId: $wishlistProductId');
+                  print(
+                      'productId: $productId, wishlistProductId: $wishlistProductId');
 
                   if (wishlistProductId == product['id']) {
                     wishlistId = item['id'];
@@ -818,7 +890,8 @@ class _SearchedProductScreenState extends State<SearchedProductScreen> {
                 print('wishlistId: $wishlistId');
 
 // Pass the retrieved wishlist ID to removeFromWishlist
-                if (wishlistId != null) { // Check if wishlistId was found
+                if (wishlistId != null) {
+                  // Check if wishlistId was found
                   await removeFromWishlist(wishlistId);
                 } else {
                   print('Wishlist ID not found for the product.');
@@ -837,5 +910,4 @@ class _SearchedProductScreenState extends State<SearchedProductScreen> {
       ],
     );
   }
-
 }

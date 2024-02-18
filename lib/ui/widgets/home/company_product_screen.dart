@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print, invalid_use_of_visible_for_testing_member, invalid_use_of_protected_member, unused_element
+
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
@@ -19,6 +21,7 @@ import 'package:get/get.dart';
 import 'package:omnicare_app/ui/utils/color_palette.dart';
 import 'package:omnicare_app/ui/utils/image_assets.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
 class CompanyProductsScreen extends StatefulWidget {
   final int companyId;
   const CompanyProductsScreen({Key? key, required this.companyId})
@@ -26,6 +29,7 @@ class CompanyProductsScreen extends StatefulWidget {
   @override
   State<CompanyProductsScreen> createState() => _CompanyProductsScreenState();
 }
+
 class _CompanyProductsScreenState extends State<CompanyProductsScreen> {
   String companyName = '';
   List<Map<String, dynamic>> companyproductList = [];
@@ -48,6 +52,7 @@ class _CompanyProductsScreenState extends State<CompanyProductsScreen> {
     fetchData();
     fetchWishlist();
   }
+
   // Add this method to fetch company data
   Future<void> fetchCompanyData() async {
     try {
@@ -74,8 +79,8 @@ class _CompanyProductsScreenState extends State<CompanyProductsScreen> {
       print('Error fetching company data: $error');
     }
   }
-  Future<void> fetchData() async {
 
+  Future<void> fetchData() async {
     try {
       setState(() {
         isLoading = true;
@@ -102,6 +107,7 @@ class _CompanyProductsScreenState extends State<CompanyProductsScreen> {
       });
     }
   }
+
   Future<void> addToWishlist(int productId) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     final String? accessToken = prefs.getString('accessToken');
@@ -143,19 +149,22 @@ class _CompanyProductsScreenState extends State<CompanyProductsScreen> {
       );
     }
   }
+
   Future<void> toggleFavorite(int productId) async {
     final provider = Provider.of<FavoriteProvider>(context, listen: false);
     final isFavorite = provider.isFavorite(productId);
 
     if (isFavorite) {
-    //  provider.removeFavorite(productId);
+      //  provider.removeFavorite(productId);
     } else {
-     // provider.addFavorite(productId);
+      // provider.addFavorite(productId);
       await addToWishlist(productId);
     }
 
-    setState(() {}); // Ensure the UI is updated to reflect the change in favorite status
+    setState(
+            () {}); // Ensure the UI is updated to reflect the change in favorite status
   }
+
   Future<void> fetchWishlist() async {
     try {
       final String? authToken = await _getAccessToken();
@@ -170,7 +179,8 @@ class _CompanyProductsScreenState extends State<CompanyProductsScreen> {
       if (response.statusCode == 200) {
         final responseData = jsonDecode(response.body);
         setState(() {
-          _wishlistItems = List<Map<String, dynamic>>.from(responseData['data']);
+          _wishlistItems =
+          List<Map<String, dynamic>>.from(responseData['data']);
         });
       }
       // else {
@@ -194,6 +204,7 @@ class _CompanyProductsScreenState extends State<CompanyProductsScreen> {
       );
     }
   }
+
   Future<void> removeFromWishlist(int wishlistId) async {
     try {
       final String? authToken = await _getAccessToken();
@@ -201,7 +212,8 @@ class _CompanyProductsScreenState extends State<CompanyProductsScreen> {
         print('Authorization token is missing.');
         return;
       }
-      final Uri url = Uri.parse('https://app.omnicare.com.bd/api/removeFromWishlist/$wishlistId');
+      final Uri url = Uri.parse(
+          'https://app.omnicare.com.bd/api/removeFromWishlist/$wishlistId');
       final response = await http.get(
         url,
         headers: {'Authorization': 'Bearer $authToken'},
@@ -234,6 +246,7 @@ class _CompanyProductsScreenState extends State<CompanyProductsScreen> {
       );
     }
   }
+
   Future<void> _handleTokenRefresh(Function onRefreshComplete) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     final String? refreshToken = prefs.getString('refreshToken');
@@ -253,12 +266,14 @@ class _CompanyProductsScreenState extends State<CompanyProductsScreen> {
       }
     }
   }
+
   Future<String?> _getAccessToken() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     return prefs.getString('accessToken');
   }
+
   Future<String?> _refreshToken(String refreshToken) async {
-    final String apiUrl = 'https://app.omnicare.com.bd/api/refresh';
+    const String apiUrl = 'https://app.omnicare.com.bd/api/refresh';
     try {
       final response = await http.post(
         Uri.parse(apiUrl),
@@ -268,7 +283,8 @@ class _CompanyProductsScreenState extends State<CompanyProductsScreen> {
       );
       if (response.statusCode == 200) {
         final Map<String, dynamic> responseData = json.decode(response.body);
-        final Map<String, dynamic> authorization = responseData['authorization'];
+        final Map<String, dynamic> authorization =
+        responseData['authorization'];
         return authorization['token'];
       } else {
         return null;
@@ -278,6 +294,7 @@ class _CompanyProductsScreenState extends State<CompanyProductsScreen> {
       return null;
     }
   }
+
   Future<void> _checkNetworkAndLoggedIn() async {
     bool hasNetwork = await checkNetwork();
     bool userLoggedIn = await isLoggedIn();
@@ -288,6 +305,7 @@ class _CompanyProductsScreenState extends State<CompanyProductsScreen> {
       Get.to(() => const NetworkCheckScreen());
     }
   }
+
   void updateFavoriteStatus(List<dynamic> wishlistData) {
     // Initialize a set to store the product IDs present in the wishlist
     Set<int> wishlistProductIds = {};
@@ -311,6 +329,7 @@ class _CompanyProductsScreenState extends State<CompanyProductsScreen> {
       }
     }
   }
+
   void addToCart(int index) {
     var cartProvider = Provider.of<CartProvider>(context, listen: false);
     var existingItem = cartItems.firstWhere(
@@ -354,11 +373,13 @@ class _CompanyProductsScreenState extends State<CompanyProductsScreen> {
         id: productId,
         image: companyproductList[index]['image'] ?? 'default_image_path',
         name: companyproductList[index]['name'] ?? 'Unknown Product',
-        sell_price: double.parse('${companyproductList[index]['sell_price'].replaceAll(',', '')}'),
+        sell_price: double.parse(
+            '${companyproductList[index]['sell_price'].replaceAll(',', '')}'),
         after_discount_price: double.parse(
             '${companyproductList[index]['after_discount_price'].replaceAll(',', '')}'),
         subtitle: 'Unknown Subtitle',
-        company_name: companyproductList[index]['brand']['brand_name'] ?? 'Unknown Company',
+        company_name: companyproductList[index]['brand']['brand_name'] ??
+            'Unknown Company',
         quantity: 1,
         addedFromProductDetails: true,
       );
@@ -386,6 +407,7 @@ class _CompanyProductsScreenState extends State<CompanyProductsScreen> {
       context.read<QuantityButtonsProvider>().setShowQuantityButtons(false);
     }
   }
+
   void updateProductQuantityInMap(int productId, int newQuantity) {
     setState(() {
       productQuantities[productId] = newQuantity;
@@ -398,6 +420,7 @@ class _CompanyProductsScreenState extends State<CompanyProductsScreen> {
       }
     });
   }
+
   // void searchProduct(String query) async {
   //   try {
   //     setState(() {
@@ -482,25 +505,24 @@ class _CompanyProductsScreenState extends State<CompanyProductsScreen> {
               pinned: true,
               backgroundColor: ColorPalette.primaryColor,
               elevation: 0,
-              title:
-              Padding(
+              title: Padding(
                 padding: const EdgeInsets.only(bottom: 8),
-                child:
-                SizedBox(
+                child: SizedBox(
                   height: 55.h,
-                 // width: 130,
-                  child:
-                  TextButton(
+                  // width: 130,
+                  child: TextButton(
                     onPressed: () {
                       Get.to(const SearchedProductScreen());
                     },
                     child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 5),
+                        padding:
+                        const EdgeInsets.symmetric(horizontal: 5),
                         height: 100,
-                       // width: 370,
-                        decoration: BoxDecoration(borderRadius: BorderRadius.circular(10),
-                          color: Colors.white,),
-
+                        // width: 370,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10),
+                          color: Colors.white,
+                        ),
                         child: Row(
                           // mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
@@ -513,7 +535,8 @@ class _CompanyProductsScreenState extends State<CompanyProductsScreen> {
                             ),
                             const Text(
                               "Search Product",
-                              style: TextStyle(color: Colors.grey, fontSize: 12),
+                              style: TextStyle(
+                                  color: Colors.grey, fontSize: 12),
                             ),
                           ],
                         )),
@@ -557,7 +580,8 @@ class _CompanyProductsScreenState extends State<CompanyProductsScreen> {
                 ),
                 delegate: SliverChildBuilderDelegate(
                       (context, index) {
-                    return buildProductCard(companyproductList[index], index);
+                    return buildProductCard(
+                        companyproductList[index], index);
                   },
                   childCount: companyproductList.length,
                 ),
@@ -568,97 +592,128 @@ class _CompanyProductsScreenState extends State<CompanyProductsScreen> {
       ),
     );
   }
+
   Widget buildProductCard(Map<String, dynamic> product, int index) {
-    final favoriteProvider = Provider.of<FavoriteProvider>(context); // Retrieve FavoriteProvider instance
+    var cartProvider = Provider.of<CartProvider>(context, listen: false);
+    final favoriteProvider = Provider.of<FavoriteProvider>(
+        context); // Retrieve FavoriteProvider instance
     final productId = product['id'] as int; // Retrieve product ID
     return Stack(
       children: [
         InkWell(
-          onTap: (){
+          onTap: () {
             Get.to(ProductDetailsScreen(productDetails: product));
           },
           child: Container(
-          padding: EdgeInsets.all(8.w),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(5.r),
-            color: ColorPalette.cardColor,
-            border: Border.all(color: ColorPalette.primaryColor),
-            boxShadow: const [
-              BoxShadow(
-                blurRadius: 4,
-                color: Colors.black12,
-                offset: Offset(0, 2),
-              ),
-            ],
-          ),
-          child: Column(
-            children: [
-              Expanded(
-                flex: 8,
-                child: Image.network(
-                  product['image'],
-                  errorBuilder: (context, error, stackTrace) {
-                    return Image.asset(
-                      ImageAssets.productJPG,
-                      scale: 2,
-                    );
-                  },
+            padding: EdgeInsets.all(8.w),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(5.r),
+              color: ColorPalette.cardColor,
+              border: Border.all(color: ColorPalette.primaryColor),
+              boxShadow: const [
+                BoxShadow(
+                  blurRadius: 4,
+                  color: Colors.black12,
+                  offset: Offset(0, 2),
                 ),
-              ),
-              SizedBox(height: 8.h),
-              Expanded(
-                flex: 10,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      '${companyproductList[index]['name']} - ${companyproductList[index]['brand']['brand_name'].split(' ').first}',
-                      style: fontStyle(12, Colors.black, FontWeight.w500),
-                    ),
-                    Text(
-                      '৳${companyproductList[index]['after_discount_price']}',
-                      style: fontStyle(12.sp, Colors.black, FontWeight.w600),
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        Text(
-                          '৳${companyproductList[index]['sell_price']}',
-                          style: const TextStyle(fontSize: 12, color: Colors.grey, fontWeight: FontWeight.w400, decoration: TextDecoration.lineThrough, decorationColor: Colors.red, decorationThickness: 3,),
-                        ),
-                        SizedBox(width: 9.w),
-                        Row(
-                          children: [
-                            Text(
-                              '৳${double.parse(companyproductList[index]['discount']).toStringAsFixed(2)}', style: fontStyle(12.sp, Colors.green, FontWeight.w600),
+              ],
+            ),
+            child: Column(
+              children: [
+                Expanded(
+                  flex: 8,
+                  child: Image.network(
+                    product['image'],
+                    errorBuilder: (context, error, stackTrace) {
+                      return Image.asset(
+                        ImageAssets.productJPG,
+                        scale: 2,
+                      );
+                    },
+                  ),
+                ),
+                SizedBox(height: 8.h),
+                Expanded(
+                  flex: 10,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        '${companyproductList[index]['name']} - ${companyproductList[index]['brand']['brand_name'].split(' ').first}',
+                        style: fontStyle(12, Colors.black, FontWeight.w500),
+                      ),
+                      Text(
+                        '৳${companyproductList[index]['after_discount_price']}',
+                        style: fontStyle(12.sp, Colors.black, FontWeight.w600),
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          Text(
+                            '৳${companyproductList[index]['sell_price']}',
+                            style: const TextStyle(
+                              fontSize: 12,
+                              color: Colors.grey,
+                              fontWeight: FontWeight.w400,
+                              decoration: TextDecoration.lineThrough,
+                              decorationColor: Colors.red,
+                              decorationThickness: 3,
                             ),
-                            if (companyproductList[index]['discount_type']?.toLowerCase() == 'percent')
-                              Text('% Off',
-                                style: fontStyle(12.sp, Colors.green, FontWeight.w600),
-                              ),
-                            if (companyproductList[index]['discount_type']?.toLowerCase() != 'percent')
+                          ),
+                          SizedBox(width: 9.w),
+                          Row(
+                            children: [
                               Text(
-                                ' ${companyproductList[index]['discount_type']} Off',
-                                style: fontStyle(11.sp, Colors.green, FontWeight.w600),
+                                '৳${double.parse(companyproductList[index]['discount']).toStringAsFixed(2)}',
+                                style: fontStyle(
+                                    12.sp, Colors.green, FontWeight.w600),
                               ),
-                          ],
-                        ),
-                      ],
-                    ),
-                    // Check if the index is within range before accessing searchResults
-                    productQuantities[companyproductList[index]['id']] == 0 ||
-                        productQuantities[companyproductList[index]['id']] == null
-                          ?
-                      InkWell(
+                              if (companyproductList[index]['discount_type']
+                                  ?.toLowerCase() ==
+                                  'percent')
+                                Text(
+                                  '% Off',
+                                  style: fontStyle(
+                                      12.sp, Colors.green, FontWeight.w600),
+                                ),
+                              if (companyproductList[index]['discount_type']
+                                  ?.toLowerCase() !=
+                                  'percent')
+                                Text(
+                                  ' ${companyproductList[index]['discount_type']} Off',
+                                  style: fontStyle(
+                                      11.sp, Colors.green, FontWeight.w600),
+                                ),
+                            ],
+                          ),
+                        ],
+                      ),
+                      // Check if the index is within range before accessing searchResults
+                      // productQuantities[companyproductList[index]['id']] == 0 ||
+                      //         productQuantities[companyproductList[index]
+                      //                 ['id']] ==
+                      //             null
+                      int.parse(cartProvider
+                          .getProductQuantityById(
+                          companyproductList[index]['id'])
+                          .toString()) ==
+                          0
+                          ? InkWell(
                         onTap: () {
                           setState(() {
-                            productQuantities[companyproductList[index]['id']] =
-                                (productQuantities[companyproductList[index]['id']] ?? 0) + 1;
+                            productQuantities[companyproductList[index]
+                            ['id']] = (productQuantities[
+                            companyproductList[index]
+                            ['id']] ??
+                                0) +
+                                1;
                             showQuantityButtons = true;
                           });
-                          SchedulerBinding.instance!.addPostFrameCallback((_) {
-                            addToCart(index); // Pass index of allproductsList
+                          SchedulerBinding.instance
+                              .addPostFrameCallback((_) {
+                            addToCart(
+                                index); // Pass index of allproductsList
                           });
                         },
                         child: Container(
@@ -670,8 +725,7 @@ class _CompanyProductsScreenState extends State<CompanyProductsScreen> {
                           ),
                           decoration: BoxDecoration(
                             color: ColorPalette.primaryColor,
-                            borderRadius:
-                            BorderRadius.circular(5),
+                            borderRadius: BorderRadius.circular(5),
                           ),
                           child: Center(
                             child: Row(
@@ -701,72 +755,22 @@ class _CompanyProductsScreenState extends State<CompanyProductsScreen> {
                           InkWell(
                             onTap: () {
                               setState(() {
-                                if (productQuantities[companyproductList[index]['id']] != null &&
-                                    productQuantities[companyproductList[index]['id']]! > 0) {
-                                  productQuantities[companyproductList[index]['id']] =
-                                      productQuantities[companyproductList[index]['id']]! - 1;
-                                  if (productQuantities[companyproductList[index]['id']] == 0) {
-                                    showQuantityButtons = false;
-                                  }
-                                }
-                                var cartProvider =
-                                Provider.of<CartProvider>(context,
-                                    listen: false);
-                                CartItem? existingItem;
-                                try {
-                                  existingItem =
-                                      cartProvider.cartItems.firstWhere(
-                                            (item) =>
-                                        item.name ==
-                                            companyproductList[index]
-                                            ['name'],
-                                      );
-                                } catch (e) {
-                                  existingItem = null;
-                                }
-                                if (existingItem != null) {
-                                  // If the item is already in the cart, increment its quantity
-                                  existingItem.quantity -= 1;
-                                  // Notify listeners to update the UI
-                                  cartProvider.notifyListeners();
-                                } else {
-                                  // If the item is not in the cart, add it
-                                  var item = CartItem(
-                                    id: companyproductList[index]['id'] as int,
-                                    image: companyproductList[index]['image'] ?? 'default_image_path',
-                                    name: companyproductList[index]['name'] ?? 'Unknown Product',
-                                    sell_price: double.parse('${companyproductList[index]['sell_price'].replaceAll(',', '')}'),
-                                    after_discount_price: double.parse('${companyproductList[index]['after_discount_price'].replaceAll(',', '')}'),
-                                    subtitle: 'Unknown Subtitle',
-                                    company_name: companyproductList[index]['brand']['brand_name'] ?? 'Unknown Company',
-                                    quantity: 1,
-                                    addedFromProductDetails: true,
-                                  );
-                                  // Add the item to the cartProvider
-                                  cartProvider.addToCart(item);
-                                  // Show a SnackBar to notify the user about the item being added to the cart
-                                  // if (mounted) {
-                                  //   ScaffoldMessenger.of(context)
-                                  //       .showSnackBar(
-                                  //     const SnackBar(
-                                  //         duration: Duration(milliseconds: 1),
-                                  //         content: Text('Added to Cart')),
-                                  //   );
-                                  // }
-                                }
-                                // Notify the CartProvider
-                                Provider.of<CartProvider>(context, listen: false).notifyListeners();
-                                // Update the product quantity in the map
-                                updateProductQuantityInMap(
-                                    companyproductList[index]['id'],
-                                    productQuantities[companyproductList[index]['id']] ?? 0);
+                                var quantity =
+                                cartProvider.getProductQuantityById(
+                                  companyproductList[index]['id'],
+                                );
+                                quantity--;
+
+                                cartProvider.updateQuantityById(
+                                  companyproductList[index]['id'],
+                                  quantity,
+                                );
                               });
                             },
                             child: Container(
                               padding: const EdgeInsets.all(5),
                               decoration: BoxDecoration(
-                                borderRadius:
-                                BorderRadius.circular(25),
+                                borderRadius: BorderRadius.circular(25),
                                 color: ColorPalette.primaryColor,
                               ),
                               child: const Icon(
@@ -778,7 +782,7 @@ class _CompanyProductsScreenState extends State<CompanyProductsScreen> {
                           Padding(
                             padding: const EdgeInsets.all(10.0),
                             child: Text(
-                              '${productQuantities[companyproductList[index]['id']]}',
+                              '${int.parse(cartProvider.getProductQuantityById(companyproductList[index]['id']).toString())}',
                               style: fontStyle(
                                 18,
                                 Colors.black,
@@ -789,58 +793,26 @@ class _CompanyProductsScreenState extends State<CompanyProductsScreen> {
                           InkWell(
                             onTap: () {
                               setState(() {
-                                productQuantities[companyproductList[index]['id']] =
-                                    productQuantities[companyproductList[index]['id']]! + 1;
-                                var cartProvider =
-                                Provider.of<CartProvider>(context, listen: false);
-                                CartItem? existingItem;
-                                try {
-                                  existingItem = cartProvider.cartItems.firstWhere((item) => item.name == companyproductList[index]['name'],);
-                                } catch (e) {
-                                  existingItem = null;
-                                }
-                                if (existingItem != null) {
-                                  // If the item is already in the cart, increment its quantity
-                                  existingItem.quantity += 1;
-                                  // Notify listeners to update the UI
-                                  cartProvider.notifyListeners();
-                                } else {
-                                  // If the item is not in the cart, add it
-                                  var item = CartItem(
-                                    id: companyproductList[index]['id'] as int,
-                                    image: companyproductList[index]['image'] ?? 'default_image_path',
-                                    name: companyproductList[index]['name'] ?? 'Unknown Product',
-                                    sell_price: double.parse('${companyproductList[index]['sell_price'].replaceAll(',', '')}'),
-                                    after_discount_price: double.parse('${companyproductList[index]['after_discount_price'].replaceAll(',', '')}'),
-                                    subtitle: 'Unknown Subtitle',
-                                    company_name: companyproductList[index]['brand']['brand_name'] ?? 'Unknown Company',
-                                    quantity: 1,
-                                    addedFromProductDetails: true,
-                                  );
-                                  // Add the item to the cartProvider
-                                  cartProvider.addToCart(item);
-                                  // Show a SnackBar to notify the user about the item being added to the cart
-                                  // if (mounted) {
-                                  //   ScaffoldMessenger.of(context)
-                                  //       .showSnackBar(
-                                  //     const SnackBar(
-                                  //         content: Text('Added to Cart')),
-                                  //   );
-                                  // }
-                                }
-                                // Update the product quantity in the map
-                                updateProductQuantityInMap(
-                                    companyproductList[index]['id'],
-                                    productQuantities[companyproductList[index]['id']] ?? 0);
+                                var quantity =
+                                cartProvider.getProductQuantityById(
+                                  companyproductList[index]['id'],
+                                );
+                                quantity++;
+
+                                cartProvider.updateQuantityById(
+                                  companyproductList[index]['id'],
+                                  quantity,
+                                );
                               });
                               // Notify the CartProvider
-                              Provider.of<CartProvider>(context, listen: false).notifyListeners();
+                              Provider.of<CartProvider>(context,
+                                  listen: false)
+                                  .notifyListeners();
                             },
                             child: Container(
                               padding: const EdgeInsets.all(5),
                               decoration: BoxDecoration(
-                                borderRadius:
-                                BorderRadius.circular(25),
+                                borderRadius: BorderRadius.circular(25),
                                 color: ColorPalette.primaryColor,
                               ),
                               child: const Icon(
@@ -851,17 +823,18 @@ class _CompanyProductsScreenState extends State<CompanyProductsScreen> {
                           ),
                         ],
                       ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
-                ),
         ),
         Positioned(
           top: 10.h,
           right: 10.w,
-          child: GestureDetector( // Wrap with GestureDetector to handle tap events
+          child: GestureDetector(
+            // Wrap with GestureDetector to handle tap events
             onTap: () async {
               // Toggle the favorite status in the provider
               favoriteProvider.toggleFavorite(productId);
@@ -883,10 +856,8 @@ class _CompanyProductsScreenState extends State<CompanyProductsScreen> {
               color: const Color(0xffE40404),
             ),
           ),
-
         ),
-    ],
+      ],
     );
   }
 }
-
