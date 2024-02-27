@@ -360,210 +360,208 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   }
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        appBar: AppBar(
-          backgroundColor: ColorPalette.primaryColor,
-          leading: IconButton(
-            onPressed: () {
-              Get.offAll(const AccountScreen());
-            },
-            icon: const Icon(
-              Icons.arrow_back,
-              color: Colors.white,
-            ),
-          ),
-          title: const Text(
-            'Edit Profile',
-            style: TextStyle(color: Colors.white),
-          ),
-          centerTitle: true,
-        ),
-        body: RefreshIndicator(
-          onRefresh: () async {
-            await fetchStoreName();
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: ColorPalette.primaryColor,
+        leading: IconButton(
+          onPressed: () {
+            Get.offAll(const AccountScreen());
           },
-          child: SingleChildScrollView(
-            child: Padding(
-              padding: EdgeInsets.symmetric(vertical: 16.h, horizontal: 24.w),
-              child:  Form(
-                key: _formKey,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Stack(
-                      children: [
-                        Container(
-                          padding: EdgeInsets.all(16.w),
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            border: Border.all(
-                              color: const Color(0xffB7D4FF),
-                            ),
+          icon: const Icon(
+            Icons.arrow_back,
+            color: Colors.white,
+          ),
+        ),
+        title: const Text(
+          'Edit Profile',
+          style: TextStyle(color: Colors.white),
+        ),
+        centerTitle: true,
+      ),
+      body: RefreshIndicator(
+        onRefresh: () async {
+          await fetchStoreName();
+        },
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: EdgeInsets.symmetric(vertical: 16.h, horizontal: 24.w),
+            child:  Form(
+              key: _formKey,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Stack(
+                    children: [
+                      Container(
+                        padding: EdgeInsets.all(16.w),
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: const Color(0xffB7D4FF),
                           ),
-                          child: CircleAvatar(
+                        ),
+                        child: CircleAvatar(
+                          radius: 30.r,
+                          child: _image == null
+                              ? (fetchedData?['pharmacy']['store_image'] != null
+                              ? Image.network(
+                            fetchedData?['pharmacy']['store_image'],
+                            fit: BoxFit.cover,
+                          )
+                              : const Icon(Icons.image, size: 40, color: Colors.white))
+                              : CircleAvatar(
+                            backgroundImage: FileImage(_image!),
                             radius: 30.r,
-                            child: _image == null
-                                ? (fetchedData?['pharmacy']['store_image'] != null
-                                ? Image.network(
-                              fetchedData?['pharmacy']['store_image'],
-                              fit: BoxFit.cover,
-                            )
-                                : const Icon(Icons.image, size: 40, color: Colors.white))
-                                : CircleAvatar(
-                              backgroundImage: FileImage(_image!),
-                              radius: 30.r,
-                            ),
                           ),
                         ),
-                        Positioned(
-                          bottom: 20,
-                          right: 0,
-                          child: InkWell(
-                            onTap: () {
-                              showModalBottomSheet(
-                                context: context,
-                                builder: (context) {
-                                  return Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: <Widget>[
-                                      ListTile(
-                                        leading: const Icon(Icons.photo_library),
-                                        title: const Text('Choose from Gallery'),
-                                        onTap: () {
-                                          Navigator.pop(context);
-                                          _pickImageFromGallery();
-                                        },
-                                      ),
-                                      ListTile(
-                                        leading: const Icon(Icons.camera_alt),
-                                        title: const Text('Take a Picture'),
-                                        onTap: () {
-                                          Navigator.pop(context);
-                                          _captureImage();
-                                        },
-                                      ),
-                                    ],
-                                  );
-                                },
-                              );
-                            },
-                            child: const Icon(
-                              Icons.edit,
-                              color: Colors.black,
-                            ),
+                      ),
+                      Positioned(
+                        bottom: 20,
+                        right: 0,
+                        child: InkWell(
+                          onTap: () {
+                            showModalBottomSheet(
+                              context: context,
+                              builder: (context) {
+                                return Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: <Widget>[
+                                    ListTile(
+                                      leading: const Icon(Icons.photo_library),
+                                      title: const Text('Choose from Gallery'),
+                                      onTap: () {
+                                        Navigator.pop(context);
+                                        _pickImageFromGallery();
+                                      },
+                                    ),
+                                    ListTile(
+                                      leading: const Icon(Icons.camera_alt),
+                                      title: const Text('Take a Picture'),
+                                      onTap: () {
+                                        Navigator.pop(context);
+                                        _captureImage();
+                                      },
+                                    ),
+                                  ],
+                                );
+                              },
+                            );
+                          },
+                          child: const Icon(
+                            Icons.edit,
+                            color: Colors.black,
                           ),
                         ),
-                      ],
-                    ),
-                    SizedBox(height: 10.h,),
-                    Text('$storeName'),
-                    Text(
-                      '$emailAddress',
-                      style: const TextStyle(color: Colors.green),
-                    ),
-                    SizedBox(height: 15.h,),
-                    TextFormField(
-                      controller: pharmacyNameController..text = pharmacyName,
-                      decoration: const InputDecoration(
-                        labelText: 'Pharmacy Name',
-                        border: OutlineInputBorder(),
                       ),
-                      validator: (value) {
-                        if (value!.isEmpty) {
-                          return 'Pharmacy Name cannot be empty';
+                    ],
+                  ),
+                  SizedBox(height: 10.h,),
+                  Text('$storeName'),
+                  Text(
+                    '$emailAddress',
+                    style: const TextStyle(color: Colors.green),
+                  ),
+                  SizedBox(height: 15.h,),
+                  TextFormField(
+                    controller: pharmacyNameController..text = pharmacyName,
+                    decoration: const InputDecoration(
+                      labelText: 'Pharmacy Name',
+                      border: OutlineInputBorder(),
+                    ),
+                    validator: (value) {
+                      if (value!.isEmpty) {
+                        return 'Pharmacy Name cannot be empty';
+                      }
+                      return null;
+                    },
+                  ),
+                  SizedBox(height: 15.h),
+                  TextFormField(
+                    controller: ownerNameController,
+                    decoration: const InputDecoration(
+                      labelText: 'Owner Name',
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                  SizedBox(height: 15.h),
+                  TextFormField(
+                    controller: drugLicenseController,
+                    decoration: const InputDecoration(
+                      labelText: 'Drug License',
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                  SizedBox(height: 15.h),
+                  TextFormField(
+                    controller: mobileNumberController,
+                    decoration: const InputDecoration(
+                      labelText: 'Mobile Number',
+                      border: OutlineInputBorder(),
+                    ),
+                    validator: (value) {
+                      if (value!.isEmpty) {
+                        return 'Mobile Number cannot be empty';
+                      } else if (value.length != 11) {
+                        return 'Mobile Number should be 11 digits';
+                      }
+                      return null;
+                    },
+                    keyboardType: TextInputType.phone,
+                  ),
+                  SizedBox(height: 15.h),
+                  DropdownButtonFormField<String>(
+                    value: selectedZoneName,
+                    items: zones.map((Zone zone) {
+                      return DropdownMenuItem<String>(
+                        value: zone.zoneName,
+                        child: Text(zone.zoneName),
+                      );
+                    }).toList(),
+                    onChanged: (String? value) {
+                      setState(() {
+                        selectedZoneName = value;
+                        selectedZone = zones.firstWhere((zone) => zone.zoneName == value);
+                      });
+                    },
+                    decoration: const InputDecoration(
+                      labelText: 'Zone',
+                      border: OutlineInputBorder(),
+                    ),
+                    validator: (value) {
+                      if (value == null) {
+                        return 'Zone cannot be empty';
+                      }
+                      return null;
+                    },
+                  ),
+                  SizedBox(height: 15.h),
+                  TextFormField(
+                    controller: shippingAddressController,
+                    decoration: const InputDecoration(
+                      labelText: 'Shipping Address',
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                  SizedBox(
+                    height: 20.h,
+                  ),
+                  Container(
+                    width: 100.0,
+                    height: 40.0,
+                    child: MaterialButton(
+                      onPressed: () {
+                        // Handle the submit button press
+                        if (_formKey.currentState!.validate()) {
+                          _submitForm();
                         }
-                        return null;
                       },
-                    ),
-                    SizedBox(height: 15.h),
-                    TextFormField(
-                      controller: ownerNameController,
-                      decoration: const InputDecoration(
-                        labelText: 'Owner Name',
-                        border: OutlineInputBorder(),
+                      color: ColorPalette.primaryColor,
+                      child: const Text('Submit',
+                        style: TextStyle(color: Colors.white, fontSize: 16),
                       ),
                     ),
-                    SizedBox(height: 15.h),
-                    TextFormField(
-                      controller: drugLicenseController,
-                      decoration: const InputDecoration(
-                        labelText: 'Drug License',
-                        border: OutlineInputBorder(),
-                      ),
-                    ),
-                    SizedBox(height: 15.h),
-                    TextFormField(
-                      controller: mobileNumberController,
-                      decoration: const InputDecoration(
-                        labelText: 'Mobile Number',
-                        border: OutlineInputBorder(),
-                      ),
-                      validator: (value) {
-                        if (value!.isEmpty) {
-                          return 'Mobile Number cannot be empty';
-                        } else if (value.length != 11) {
-                          return 'Mobile Number should be 11 digits';
-                        }
-                        return null;
-                      },
-                      keyboardType: TextInputType.phone,
-                    ),
-                    SizedBox(height: 15.h),
-                    DropdownButtonFormField<String>(
-                      value: selectedZoneName,
-                      items: zones.map((Zone zone) {
-                        return DropdownMenuItem<String>(
-                          value: zone.zoneName,
-                          child: Text(zone.zoneName),
-                        );
-                      }).toList(),
-                      onChanged: (String? value) {
-                        setState(() {
-                          selectedZoneName = value;
-                          selectedZone = zones.firstWhere((zone) => zone.zoneName == value);
-                        });
-                      },
-                      decoration: const InputDecoration(
-                        labelText: 'Zone',
-                        border: OutlineInputBorder(),
-                      ),
-                      validator: (value) {
-                        if (value == null) {
-                          return 'Zone cannot be empty';
-                        }
-                        return null;
-                      },
-                    ),
-                    SizedBox(height: 15.h),
-                    TextFormField(
-                      controller: shippingAddressController,
-                      decoration: const InputDecoration(
-                        labelText: 'Shipping Address',
-                        border: OutlineInputBorder(),
-                      ),
-                    ),
-                    SizedBox(
-                      height: 20.h,
-                    ),
-                    Container(
-                      width: 100.0,
-                      height: 40.0,
-                      child: MaterialButton(
-                        onPressed: () {
-                          // Handle the submit button press
-                          if (_formKey.currentState!.validate()) {
-                            _submitForm();
-                          }
-                        },
-                        color: ColorPalette.primaryColor,
-                        child: const Text('Submit',
-                          style: TextStyle(color: Colors.white, fontSize: 16),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
           ),

@@ -60,7 +60,7 @@ class _LoginScreenState extends State<LoginScreen> {
         prefs.setString('accessToken', accessToken);
         prefs.setString('refreshToken', refreshToken);
 
-        Get.offAll(BottomNavBarScreen());
+        Get.offAll(const BottomNavBarScreen());
       } else if (response.statusCode == 401) {
         _showSnackBar('Incorrect email or password. Please try again.');
       } else {
@@ -121,7 +121,7 @@ class _LoginScreenState extends State<LoginScreen> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(message),
-        duration: Duration(seconds: 2),
+        duration: const Duration(seconds: 2),
       ),
     );
   }
@@ -140,7 +140,7 @@ class _LoginScreenState extends State<LoginScreen> {
               children: [
                 Image.asset(ImageAssets.splashLogoPNG, width: 210.w,),
                 SizedBox(height: 25.h,),
-                Text(
+                const Text(
                   "Login here",
                   style: TextStyle(
                     fontSize: 24,
@@ -158,7 +158,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     hintText: "Enter Email Address",
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(24),
-                      borderSide: BorderSide(color: Color(0xff08377C)),
+                      borderSide: const BorderSide(color: Color(0xff08377C)),
                     ),
                   ),
                   validator: (value) {
@@ -180,7 +180,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     hintText: "Enter Password",
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(24),
-                      borderSide: BorderSide(color: Color(0xff08377C)),
+                      borderSide: const BorderSide(color: Color(0xff08377C)),
                     ),
                     suffixIcon: IconButton(
                       icon: Icon(
@@ -209,7 +209,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       _login();
                     }
                   },
-                  child: Text('Login', style: TextStyle(color: Colors.white)),
+                  child: const Text('Login', style: TextStyle(color: Colors.white)),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: ColorPalette.primaryColor,
                   ),
